@@ -113,8 +113,8 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
 .kr-word{font-family:'Gowun Batang','Noto Serif KR',serif;font-size:34px;font-weight:700;color:var(--ink);}
 .kr-read{font-size:14px;color:var(--sub);}
 .ja-word{font-size:26px;font-weight:700;color:var(--ink);}
-.spk{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;
-  background:var(--paper);border:1px solid var(--line2);color:var(--ink2);cursor:pointer;font-size:14px;flex-shrink:0;}
+.spk{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;
+  background:var(--paper);border:1px solid var(--line2);color:var(--ink2);cursor:pointer;font-size:20px;flex-shrink:0;}
 .spk:active{background:var(--line);}
 .tapfoot{text-align:center;font-size:11px;color:var(--sub);}
 .back .bhead{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
@@ -195,6 +195,43 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
 .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
 
 .footer-note{text-align:center;font-size:11px;color:var(--sub);margin-top:26px;line-height:1.7;}
+.fc-range{width:100%;height:34px;margin:0 0 12px;accent-color:var(--ink);}
+table.wl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+.wl th{background:var(--paper);font-size:11.5px;color:var(--sub);text-align:left;padding:6px;border-bottom:1px solid var(--line2);}
+.wl td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5;}
+.wl-a{width:30%;}.wl-b{width:28%;}
+.wl-no{display:block;font-size:10.5px;color:var(--sub);}
+.wl-sub{font-size:11.5px;color:var(--sub);}
+.wl-ex2{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line2);}
+.inv-phone{background:#0b0b2a;border-radius:14px;overflow:hidden;color:#fff;user-select:none;-webkit-user-select:none;}
+.inv-hud{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:13px;background:#101040;}
+.inv-hud b{font-size:20px;font-variant-numeric:tabular-nums;}
+.inv-mb{display:inline-block;padding:4px 8px;border:1px solid #4a56c8;border-radius:8px;font-size:11px;margin-left:6px;cursor:pointer;}
+.inv-mb.off{opacity:.4;text-decoration:line-through;}
+.inv-field{position:relative;height:clamp(220px,38vh,320px);overflow:hidden;background-color:#0b0b2a;background-image:radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#9aa3ff 1px,transparent 1.5px);background-size:64px 64px,97px 97px;background-position:0 0,23px 41px;}
+.inv-line{position:absolute;left:0;right:0;bottom:62px;border-top:2px dashed #ff5a4d;opacity:.7;}
+.inv-en{position:absolute;top:0;font-size:40px;line-height:1;margin-left:-20px;animation:invfall 10s linear forwards;}
+@keyframes invfall{from{transform:translateY(0)}to{transform:translateY(var(--fy,200px))}}
+.inv-cn{position:absolute;left:50%;bottom:8px;width:0;}
+.inv-base{position:absolute;left:-30px;bottom:0;width:60px;height:24px;background:#6c7bff;border-radius:6px 6px 0 0;}
+.inv-bar{position:absolute;left:-7px;bottom:16px;width:14px;height:38px;background:#c9d0ff;border-radius:4px 4px 0 0;transform-origin:50% 100%;}
+.inv-beam{position:absolute;left:50%;width:6px;margin-left:-3px;background:#7dfcff;border-radius:3px;transform-origin:50% 100%;display:none;}
+.inv-boom{position:absolute;font-size:46px;margin:-23px 0 0 -23px;animation:invpop .5s ease-out forwards;}
+@keyframes invpop{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.6);opacity:0}}
+.inv-toast{position:absolute;top:8px;left:0;right:0;text-align:center;font-size:15px;font-weight:700;color:#ffb3ab;min-height:22px;z-index:2;}
+.inv-panel{background:#15154a;padding:10px 12px 14px;}
+.inv-q{text-align:center;font-size:30px;font-weight:700;margin-bottom:10px;min-height:42px;line-height:1.3;}
+.inv-q small{font-size:13px;font-weight:400;color:#aab;margin-left:6px;}
+.inv-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.inv-opt{min-height:54px;border:1px solid #4a56c8;background:#1d1d63;color:#fff;border-radius:10px;font-size:17px;font-family:inherit;touch-action:manipulation;}
+.inv-opt small{display:block;font-size:11px;color:#aab;}
+.inv-opt.ng{background:#7a1f1f;border-color:#ff6b6b;animation:invsh .3s;}
+@keyframes invsh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.iv-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+.iv-tbl th,.iv-tbl td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;}
+.iv-tbl .spk{width:32px;height:32px;font-size:15px;margin-left:4px;}
+.iv-new{background:#fff3c4;}
+.iv-ok{color:#1f9d55;font-weight:700;}.iv-ng{color:#d33;font-weight:700;}.iv-re{color:#c98a00;font-weight:700;}
 </style>
 </head>
 <body>
@@ -256,9 +293,9 @@ const WORDS = [
 {no:43,pos:'v',kr:'견디다',ja:'耐える',note:'',ex:'힘든 시간을 잘 견뎠어요.',exja:'辛い時間をよく耐えました。',ex2:'그는 아픔을 참고 잘 견뎠어요.',exja2:'彼は痛みをこらえてよく耐えました。',exen:'I endured a difficult time well.',ex2en:'He bore the pain and endured it well.'},
 {no:44,pos:'v',kr:'고르다',ja:'選ぶ',irr:'「르」不規則: 고르다 → 골라요（語幹の直前母音がㅗ/ㅏの時ㄹㄹに変化）',note:'',ex:'마음에 드는 옷을 골라 보세요.',exja:'気に入る服を選んでみてください。',ex2:'선물로 무엇을 고를지 고민했어요.',exja2:'プレゼントに何を選ぶか悩みました。',exen:'Please pick out clothes you like.',ex2en:'I agonized over what to choose for a gift.'},
 {no:45,pos:'v',kr:'고치다',ja:'直す',note:'',ex:'고장 난 시계를 고쳤어요.',exja:'壊れた時計を直しました。',ex2:'잘못된 습관을 고치려고 노력해요.',exja2:'悪い習慣を直そうと努力しています。',exen:'I fixed the broken clock.',ex2en:'I\'m trying to break a bad habit.'},
-{no:46,pos:'v',kr:'구하다',ja:'求める、探す',note:'',ex:'새 아르바이트를 구하고 있어요.',exja:'新しいバイトを探しています。',ex2:'급하게 도움을 구했어요.',exja2:'急いで助けを求めました。',exen:'I\'m looking for a new part-time job.',ex2en:'I urgently asked for help.'},
+{no:46,pos:'v',kr:'구하다',hanja:'求～',ja:'求める、探す',note:'',ex:'새 아르바이트를 구하고 있어요.',exja:'新しいバイトを探しています。',ex2:'급하게 도움을 구했어요.',exja2:'急いで助けを求めました。',exen:'I\'m looking for a new part-time job.',ex2en:'I urgently asked for help.'},
 {no:47,pos:'v',kr:'굽다',ja:'焼く',irr:'「ㅂ」不規則: 굽다 → 구워요',note:'',ex:'고기를 불에 구워 먹었어요.',exja:'肉を火で焼いて食べました。',ex2:'생선을 노릇노릇하게 구웠어요.',exja2:'魚をこんがりと焼きました。',exen:'I grilled and ate meat over a fire.',ex2en:'I grilled the fish until it was nicely browned.'},
-{no:48,pos:'v',kr:'권하다',ja:'勧める',note:'',ex:'친구에게 이 책을 권했어요.',exja:'友達にこの本を勧めました。',ex2:'의사가 규칙적인 운동을 권했어요.',exja2:'医者が規則的な運動を勧めました。',exen:'I recommended this book to my friend.',ex2en:'The doctor recommended regular exercise.'},
+{no:48,pos:'v',kr:'권하다',hanja:'勧～',ja:'勧める',note:'',ex:'친구에게 이 책을 권했어요.',exja:'友達にこの本を勧めました。',ex2:'의사가 규칙적인 운동을 권했어요.',exja2:'医者が規則的な運動を勧めました。',exen:'I recommended this book to my friend.',ex2en:'The doctor recommended regular exercise.'},
 {no:49,pos:'v',kr:'그만두다',ja:'やめる',note:'',ex:'회사를 그만두고 유학을 갔어요.',exja:'会社をやめて留学に行きました。',ex2:'몸이 아파서 아르바이트를 그만두었어요.',exja2:'体調が悪くてバイトをやめました。',exen:'I quit my job and went to study abroad.',ex2en:'I quit my part-time job because I wasn\'t feeling well.'},
 {no:50,pos:'v',kr:'그치다',ja:'やむ、止まる',note:'',ex:'비가 그치면 나갈게요.',exja:'雨がやんだら出かけます。',ex2:'울음이 좀처럼 그치지 않았어요.',exja2:'泣き止むのがなかなかできませんでした。',exen:'I\'ll go out once the rain stops.',ex2en:'I could hardly stop crying.'},
 {no:51,pos:'v',kr:'기르다',ja:'育てる、養う、飼う、伸ばす',irr:'「르」不規則: 기르다 → 길러요',note:'',ex:'저는 강아지를 기르고 있어요.',exja:'私は子犬を飼っています。',ex2:'머리를 길게 기르고 있어요.',exja2:'髪を長く伸ばしています。',exen:'I\'m raising a puppy.',ex2en:'I\'m growing my hair out.'},
@@ -371,7 +408,7 @@ const WORDS = [
 {no:158,pos:'v',kr:'닮다',ja:'似る、似通う',note:'',ex:'저는 아버지를 많이 닮았어요.',exja:'私は父にとても似ています。',ex2:'자매는 성격까지 닮았어요.',exja2:'姉妹は性格まで似ています。',exen:'I look a lot like my father.',ex2en:'The sisters are similar even in personality.',week:2},
 {no:159,pos:'v',kr:'담그다',ja:'浸す、漬ける',irr:'「으」脱落: 담그다 → 담가요（語幹の으が아/어語尾の前で脱落。5大不規則には含まれないが同様の変化）',note:'',ex:'매년 김장을 담가요.',exja:'毎年キムチを漬けます。',ex2:'발을 따뜻한 물에 담갔어요.',exja2:'足を温かいお湯に浸しました。',exen:'We make kimchi every year.',ex2en:'I soaked my feet in warm water.',week:2},
 {no:160,pos:'v',kr:'담기다',ja:'入れられる、盛られる、込められる',note:'',ex:'이 음식에는 정성이 담겨 있어요.',exja:'この料理には真心がこもっています。',ex2:'상자에 선물이 담겨 있었어요.',exja2:'箱にプレゼントが入っていました。',exen:'This dish is made with heartfelt care.',ex2en:'There was a present inside the box.',week:2},
-{no:161,pos:'v',kr:'당하다',ja:'当面する、匹敵する、被る、やられる',note:'',ex:'그는 사고를 당했어요.',exja:'彼は事故に遭いました。',ex2:'친구에게 사기를 당했어요.',exja2:'友達に詐欺に遭いました。',exen:'He was involved in an accident.',ex2en:'I was scammed by a friend.',week:2},
+{no:161,pos:'v',kr:'당하다',hanja:'当～',ja:'当面する、匹敵する、被る、やられる',note:'',ex:'그는 사고를 당했어요.',exja:'彼は事故に遭いました。',ex2:'친구에게 사기를 당했어요.',exja2:'友達に詐欺に遭いました。',exen:'He was involved in an accident.',ex2en:'I was scammed by a friend.',week:2},
 {no:162,pos:'v',kr:'닿다',read:'다타',ja:'触れる、届く、着く',note:'',ex:'손이 천장에 닿아요.',exja:'手が天井に届きます。',ex2:'배가 항구에 닿았어요.',exja2:'船が港に着きました。',exen:'My hand reaches the ceiling.',ex2en:'The ship arrived at the port.',week:2},
 {no:163,pos:'v',kr:'대다',ja:'当てる、触れる、比べる',note:'',ex:'상처에 약을 대었어요.',exja:'傷に薬を当てました。',ex2:'두 사람의 실력을 대 보면 차이가 커요.',exja2:'二人の実力を比べてみると差が大きいです。',exen:'I put medicine on the wound.',ex2en:'The gap in skill between the two is large when compared.',week:2},
 {no:164,pos:'v',kr:'더하다',ja:'（前よりも）ひどくなる、加える、足す',note:'',ex:'3에 5를 더하면 8이에요.',exja:'3に5を足すと8です。',ex2:'날씨가 갈수록 더위를 더해요.',exja2:'天気がだんだん暑さを増していきます。',exen:'3 plus 5 equals 8.',ex2en:'The weather keeps getting hotter.',week:2},
@@ -592,12 +629,12 @@ const WORDS = [
 {no:379,pos:'v',kr:'뿌리다',ja:'まく、振りまく',note:'',ex:'꽃밭에 물을 뿌렸어요.',exja:'花畑に水をまきました。',ex2:'향수를 살짝 뿌렸어요.',exja2:'香水を軽く振りかけました。',exen:'I sprayed water on the flower bed.',ex2en:'I lightly sprayed on some perfume.',week:4},
 {no:380,pos:'v',kr:'사라지다',ja:'消える',note:'',ex:'안개가 사라졌어요.',exja:'霧が消えました。',ex2:'갑자기 그가 사라졌어요.',exja2:'急に彼が姿を消しました。',exen:'The fog cleared.',ex2en:'He suddenly disappeared.',week:4},
 {no:381,pos:'v',kr:'살리다',ja:'生かす',note:'',ex:'의사가 환자를 살렸어요.',exja:'医者が患者を救いました。',ex2:'이 재료를 잘 살려서 요리했어요.',exja2:'この材料を上手に生かして料理しました。',exen:'The doctor saved the patient.',ex2en:'I made good use of this ingredient in cooking.',week:4},
-{no:382,pos:'v',kr:'상하다',ja:'傷む、傷つく',note:'',ex:'더운 날씨에 음식이 상했어요.',exja:'暑い天気で食べ物が傷みました。',ex2:'그의 말에 마음이 상했어요.',exja2:'彼の言葉に心が傷つきました。',exen:'The food went bad in the hot weather.',ex2en:'My heart was hurt by his words.',week:4},
+{no:382,pos:'v',kr:'상하다',hanja:'傷～',ja:'傷む、傷つく',note:'',ex:'더운 날씨에 음식이 상했어요.',exja:'暑い天気で食べ物が傷みました。',ex2:'그의 말에 마음이 상했어요.',exja2:'彼の言葉に心が傷つきました。',exen:'The food went bad in the hot weather.',ex2en:'My heart was hurt by his words.',week:4},
 {no:383,pos:'v',kr:'생겨나다',ja:'生じる、発生する',note:'',ex:'새로운 문제가 생겨났어요.',exja:'新しい問題が生じました。',ex2:'마을에 시장이 생겨났어요.',exja2:'村に市場ができました。',exen:'A new problem arose.',ex2en:'A market sprang up in the village.',week:4},
 {no:384,pos:'v',kr:'서두르다',irr:'「르」不規則: 서두르다→서둘러요',ja:'急ぐ、あせる',note:'',ex:'늦어서 서둘렀어요.',exja:'遅れたので急ぎました。',ex2:'서두르다가 넘어졌어요.',exja2:'急いでいて転びました。',exen:'I hurried because I was running late.',ex2en:'I fell while rushing.',week:4},
 {no:385,pos:'v',kr:'섞다',ja:'混ぜる、交える',note:'',ex:'물감을 섞어서 색을 만들었어요.',exja:'絵の具を混ぜて色を作りました。',ex2:'소금과 설탕을 섞지 마세요.',exja2:'塩と砂糖を混ぜないでください。',exen:'I mixed paints to make a color.',ex2en:'Please don\'t mix salt and sugar.',week:4},
 {no:386,pos:'v',kr:'섞이다',ja:'混ざる、混じる',note:'',ex:'두 색이 섞여서 새 색이 됐어요.',exja:'二つの色が混ざって新しい色になりました。',ex2:'소음에 목소리가 섞여서 안 들려요.',exja2:'騒音に声が混じって聞こえません。',exen:'The two colors mixed and became a new color.',ex2en:'The noise is drowning out the voice.',week:4},
-{no:387,pos:'v',kr:'속하다',ja:'属する',note:'',ex:'저는 영업팀에 속해 있어요.',exja:'私は営業チームに属しています。',ex2:'이 동물은 포유류에 속해요.',exja2:'この動物は哺乳類に属します。',exen:'I belong to the sales team.',ex2en:'This animal belongs to the mammal group.',week:4},
+{no:387,pos:'v',kr:'속하다',hanja:'属～',ja:'属する',note:'',ex:'저는 영업팀에 속해 있어요.',exja:'私は営業チームに属しています。',ex2:'이 동물은 포유류에 속해요.',exja2:'この動物は哺乳類に属します。',exen:'I belong to the sales team.',ex2en:'This animal belongs to the mammal group.',week:4},
 {no:388,pos:'v',kr:'숙이다',ja:'（頭、首を）下げる、うなだれる、うつむく',note:'',ex:'고개를 숙여 인사했어요.',exja:'頭を下げてあいさつしました。',ex2:'부끄러워서 고개를 숙였어요.',exja2:'恥ずかしくてうつむきました。',exen:'I bowed my head in greeting.',ex2en:'I looked down out of embarrassment.',week:4},
 {no:389,pos:'v',kr:'숨다',ja:'隠れる',note:'',ex:'아이가 옷장 안에 숨었어요.',exja:'子供がタンスの中に隠れました。',ex2:'구름 뒤로 해가 숨었어요.',exja2:'雲の後ろに太陽が隠れました。',exen:'The child hid inside the wardrobe.',ex2en:'The sun hid behind the clouds.',week:4},
 {no:390,pos:'v',kr:'쉬다',ja:'呼吸する',note:'「休む」の意味の動詞「쉬다」と同形。',ex:'깊게 숨을 쉬어 보세요.',exja:'深く息を吸ってみてください。',ex2:'숨을 못 쉴 정도로 웃었어요.',exja2:'息ができないほど笑いました。',exen:'Try taking a deep breath.',ex2en:'I laughed so hard I could barely breathe.',week:4},
@@ -706,13 +743,13 @@ const WORDS = [
 {no:493,pos:'v',kr:'옮다',ja:'移る、変わる、感染する',note:'',ex:'감기가 옮았어요.',exja:'風邪がうつりました。',ex2:'불이 옆집으로 옮았어요.',exja2:'火が隣の家に燃え移りました。',exen:'I caught a cold from someone.',ex2en:'The fire spread to the house next door.',week:5},
 {no:494,pos:'v',kr:'외치다',ja:'叫ぶ、わめく',note:'',ex:'그는 큰 소리로 외쳤어요.',exja:'彼は大きな声で叫びました。',ex2:'도와 달라고 외쳤어요.',exja2:'助けてくれと叫びました。',exen:'He shouted loudly.',ex2en:'He shouted for help.',week:5},
 {no:495,pos:'v',kr:'울리다',ja:'鳴る、泣かせる、響かせる、鳴らす',note:'',ex:'전화벨이 울렸어요.',exja:'電話のベルが鳴りました。',ex2:'그의 말이 감동을 울렸어요.',exja2:'彼の言葉が感動を呼び起こしました。',exen:'The phone rang.',ex2en:'His words moved me deeply.',week:5},
-{no:496,pos:'v',kr:'원하다',ja:'願う、望む、欲する、求める',note:'',ex:'평화를 원해요.',exja:'平和を望みます。',ex2:'원하는 대학에 합격했어요.',exja2:'望む大学に合格しました。',exen:'I wish for peace.',ex2en:'I got into the university I wanted.',week:5},
+{no:496,pos:'v',kr:'원하다',hanja:'願～',ja:'願う、望む、欲する、求める',note:'',ex:'평화를 원해요.',exja:'平和を望みます。',ex2:'원하는 대학에 합격했어요.',exja2:'望む大学に合格しました。',exen:'I wish for peace.',ex2en:'I got into the university I wanted.',week:5},
 {no:497,pos:'a',kr:'가득하다',ja:'いっぱいだ、みなぎっている、満ちている',note:'',ex:'방에 사람이 가득했어요.',exja:'部屋に人がいっぱいでした。',ex2:'희망이 가득한 얼굴이었어요.',exja2:'希望に満ちた顔でした。',exen:'The room was full of people.',ex2en:'It was a face full of hope.',week:5},
 {no:498,pos:'a',kr:'곱다',irr:'「ㅂ」不規則: 곱다→고와요（곱다・돕다は와になる特殊型）',ja:'美しい、気立てが優しい',note:'',ex:'손이 참 고와요.',exja:'手が本当にきれいです。',ex2:'마음씨가 고운 사람이에요.',exja2:'気立てのやさしい人です。',exen:'Her hands are really lovely.',ex2en:'She\'s a person with a gentle heart.',week:5},
-{no:499,pos:'a',kr:'굉장하다',ja:'すごい、素晴らしい、すさまじい',note:'',ex:'경치가 굉장했어요.',exja:'景色がすごかったです。',ex2:'굉장한 발전을 이뤘어요.',exja2:'すさまじい発展を遂げました。',exen:'The scenery was amazing.',ex2en:'They achieved tremendous growth.',week:5},
+{no:499,pos:'a',kr:'굉장하다',hanja:'宏壮～',ja:'すごい、素晴らしい、すさまじい',note:'',ex:'경치가 굉장했어요.',exja:'景色がすごかったです。',ex2:'굉장한 발전을 이뤘어요.',exja2:'すさまじい発展を遂げました。',exen:'The scenery was amazing.',ex2en:'They achieved tremendous growth.',week:5},
 {no:500,pos:'a',kr:'굵다',ja:'太い、（粒などが）粗い',note:'',ex:'이 나무는 줄기가 굵어요.',exja:'この木は幹が太いです。',ex2:'빗방울이 굵어졌어요.',exja2:'雨粒が大きくなりました。',exen:'This tree has a thick trunk.',ex2en:'The raindrops got bigger.',week:5},
 {no:501,pos:'a',kr:'귀엽다',irr:'「ㅂ」不規則: 귀엽다→귀여워요',ja:'かわいい',note:'',ex:'강아지가 정말 귀여워요.',exja:'子犬が本当にかわいいです。',ex2:'귀여운 표정을 지었어요.',exja2:'かわいい表情をしました。',exen:'The puppy is really cute.',ex2en:'She made a cute expression.',week:5},
-{no:502,pos:'a',kr:'급하다',ja:'急だ、緊急だ、急を要する',note:'',ex:'급한 일이 생겼어요.',exja:'急用ができました。',ex2:'성격이 너무 급해요.',exja2:'性格がとてもせっかちです。',exen:'I have urgent business.',ex2en:'My personality is very impatient.',week:5},
+{no:502,pos:'a',kr:'급하다',hanja:'急～',ja:'急だ、緊急だ、急を要する',note:'',ex:'급한 일이 생겼어요.',exja:'急用ができました。',ex2:'성격이 너무 급해요.',exja2:'性格がとてもせっかちです。',exen:'I have urgent business.',ex2en:'My personality is very impatient.',week:5},
 {no:503,pos:'a',kr:'까맣다',irr:'「ㅎ」不規則: 까맣다→까매요',ja:'真っ黒い',note:'',ex:'머리가 까매요.',exja:'髪が真っ黒です。',ex2:'햇볕에 타서 얼굴이 까맣게 됐어요.',exja2:'日焼けして顔が真っ黒になりました。',exen:'My hair is jet black.',ex2en:'My face got tanned dark from the sun.',week:5},
 {no:504,pos:'a',kr:'깨끗하다',ja:'清潔だ、きれいだ',note:'',ex:'방을 깨끗하게 청소했어요.',exja:'部屋をきれいに掃除しました。',ex2:'물이 아주 깨끗해요.',exja2:'水がとてもきれいです。',exen:'I cleaned the room thoroughly.',ex2en:'The water is very clean.',week:5},
 {no:505,pos:'a',kr:'낡다',ja:'古い',note:'',ex:'낡은 옷을 버렸어요.',exja:'古い服を捨てました。',ex2:'이 건물은 많이 낡았어요.',exja2:'この建物はかなり古びています。',exen:'I threw away old clothes.',ex2en:'This building is quite worn down.',week:5},
@@ -721,7 +758,7 @@ const WORDS = [
 {no:508,pos:'a',kr:'놀랍다',irr:'「ㅂ」不規則: 놀랍다→놀라워요',ja:'驚くべきだ、目覚ましい',note:'',ex:'놀라운 소식을 들었어요.',exja:'驚くべき知らせを聞きました。',ex2:'그의 실력은 정말 놀라워요.',exja2:'彼の実力は本当に驚くべきものです。',exen:'I heard some surprising news.',ex2en:'His skill is truly amazing.',week:5},
 {no:509,pos:'a',kr:'느리다',ja:'のろい、遅い、ゆるい',note:'',ex:'인터넷 속도가 느려요.',exja:'インターネットの速度が遅いです。',ex2:'걸음이 느린 편이에요.',exja2:'歩みが遅い方です。',exen:'The internet speed is slow.',ex2en:'He\'s rather slow in his walking pace.',week:5},
 {no:510,pos:'a',kr:'답답하다',ja:'重苦しい、息苦しい、じれったい',note:'',ex:'방이 좁아서 답답해요.',exja:'部屋が狭くて息苦しいです。',ex2:'그의 태도가 너무 답답했어요.',exja2:'彼の態度がとてもじれったかったです。',exen:'The room is stuffy because it\'s small.',ex2en:'His attitude was really frustrating.',week:5},
-{no:511,pos:'a',kr:'당연하다',ja:'当然だ',note:'',ex:'그건 당연한 일이에요.',exja:'それは当然のことです。',ex2:'당연히 도와드려야죠.',exja2:'当然お手伝いしなければいけませんよね。',exen:'That\'s a natural thing.',ex2en:'Of course I should help you out.',week:5},
+{no:511,pos:'a',kr:'당연하다',hanja:'当然～',ja:'当然だ',note:'',ex:'그건 당연한 일이에요.',exja:'それは当然のことです。',ex2:'당연히 도와드려야죠.',exja2:'当然お手伝いしなければいけませんよね。',exen:'That\'s a natural thing.',ex2en:'Of course I should help you out.',week:5},
 {no:512,pos:'a',kr:'대단하다',ja:'甚だしい、すごい、大変だ、素晴らしい',note:'',ex:'그의 실력이 대단해요.',exja:'彼の実力がすごいです。',ex2:'정말 대단한 노력이었어요.',exja2:'本当にすごい努力でした。',exen:'His skill is amazing.',ex2en:'It really was tremendous effort.',week:5},
 {no:513,pos:'n',kr:'수술',hanja:'手術',ja:'手術',note:'',ex:'어제 수술을 받았어요.',exja:'昨日手術を受けました。',ex2:'수술 후 회복이 빨라요.',exja2:'手術後の回復が早いです。',exen:'I had surgery yesterday.',ex2en:'Recovery after surgery is fast.',week:5},
 {no:514,pos:'n',kr:'수입²',hanja:'輸入',ja:'輸入',note:'同形の「수입¹（収入）」とは別語。',ex:'이 과일은 수입 제품이에요.',exja:'この果物は輸入品です。',ex2:'수입이 늘면서 국내 물가도 영향을 받아요.',exja2:'輸入が増えて国内物価も影響を受けます。',exen:'This fruit is an imported product.',ex2en:'As imports increase, domestic prices are also affected.',week:5},
@@ -830,7 +867,7 @@ const WORDS = [
 {no:617,pos:'a',kr:'부럽다',irr:'「ㅂ」不規則: 부럽다→부러워요',ja:'うらやましい',note:'',ex:'그의 재능이 부러워요.',exja:'彼の才能がうらやましいです。',ex2:'행복해 보여서 부러워요.',exja2:'幸せそうでうらやましいです。',exen:'I envy his talent.',ex2en:'I\'m envious because they look so happy.',week:6},
 {no:618,pos:'a',kr:'부르다',irr:'「르」不規則: 부르다→불러요',ja:'（お腹が）いっぱいだ',note:'同形の動詞「부르다（呼ぶ、歌う）」とは別語。',ex:'배가 불러요.',exja:'お腹がいっぱいです。',ex2:'너무 먹어서 배가 불러요.',exja2:'食べ過ぎてお腹がいっぱいです。',exen:'My stomach is full.',ex2en:'I\'m full because I ate too much.',week:6},
 {no:619,pos:'a',kr:'부지런하다',ja:'勤勉だ、まめだ',note:'',ex:'그는 아주 부지런해요.',exja:'彼はとても勤勉です。',ex2:'부지런히 일했어요.',exja2:'まめに働きました。',exen:'He\'s very diligent.',ex2en:'I worked diligently.',week:6},
-{no:620,pos:'a',kr:'분명하다',ja:'はっきりしている、明らかだ',note:'',ex:'그의 태도가 분명해요.',exja:'彼の態度がはっきりしています。',ex2:'분명한 증거가 있어요.',exja2:'明らかな証拠があります。',exen:'His attitude is clear.',ex2en:'There\'s clear evidence.',week:6},
+{no:620,pos:'a',kr:'분명하다',hanja:'分明～',ja:'はっきりしている、明らかだ',note:'',ex:'그의 태도가 분명해요.',exja:'彼の態度がはっきりしています。',ex2:'분명한 증거가 있어요.',exja2:'明らかな証拠があります。',exen:'His attitude is clear.',ex2en:'There\'s clear evidence.',week:6},
 {no:621,pos:'a',kr:'붉다',ja:'赤い',note:'',ex:'노을이 붉게 물들었어요.',exja:'夕焼けが赤く染まりました。',ex2:'단풍이 붉게 물들었어요.',exja2:'紅葉が赤く色づきました。',exen:'The sunset turned a deep red.',ex2en:'The autumn leaves turned a deep red.',week:6},
 {no:622,pos:'a',kr:'빨갛다',irr:'「ㅎ」不規則: 빨갛다→빨개요',ja:'赤い',note:'',ex:'사과가 빨개요.',exja:'リンゴが赤いです。',ex2:'얼굴이 빨갛게 달아올랐어요.',exja2:'顔が真っ赤にほてりました。',exen:'The apple is red.',ex2en:'My face flushed bright red.',week:6},
 {no:623,pos:'a',kr:'새롭다',irr:'「ㅂ」不規則: 새롭다→새로워요',ja:'新しい',note:'',ex:'새로운 도전을 시작했어요.',exja:'新しい挑戦を始めました。',ex2:'매일이 새로워요.',exja2:'毎日が新しいです。',exen:'I started a new challenge.',ex2en:'Every day is new.',week:6},
@@ -933,8 +970,8 @@ const WORDS = [
 {no:720,pos:'v',kr:'추다',ja:'（踊りを）踊る',note:'',ex:'신나게 춤을 췄어요.',exja:'楽しく踊りを踊りました。',ex2:'같이 춤을 추자고 했어요.',exja2:'一緒に踊ろうと言いました。',exen:'We danced happily.',ex2en:'He suggested we dance together.',week:7},
 {no:721,pos:'a',kr:'섭섭하다',ja:'名残惜しい、寂しい',note:'',ex:'헤어지려니 섭섭해요.',exja:'別れると思うと名残惜しいです。',ex2:'섭섭한 마음이 들었어요.',exja2:'寂しい気持ちになりました。',exen:'I feel a sense of loss thinking about parting.',ex2en:'I felt a sense of sadness.',week:7},
 {no:722,pos:'a',kr:'세다',ja:'（力が）強い、（数を）数える',note:'多義語。ここでは「強い」の意味中心。',ex:'힘이 정말 세요.',exja:'力が本当に強いです。',ex2:'바람이 세게 불어요.',exja2:'風が強く吹いています。',exen:'His strength is really impressive.',ex2en:'The wind is blowing strongly.',week:7},
-{no:723,pos:'a',kr:'소중하다',ja:'大切だ、貴重だ',note:'',ex:'저에게 소중한 사람이에요.',exja:'私にとって大切な人です。',ex2:'소중한 시간을 함께했어요.',exja2:'大切な時間を共にしました。',exen:'You\'re a precious person to me.',ex2en:'We spent precious time together.',week:7},
-{no:724,pos:'a',kr:'솔직하다',ja:'率直だ、正直だ',note:'',ex:'솔직하게 말해 주세요.',exja:'率直に言ってください。',ex2:'그는 솔직한 성격이에요.',exja2:'彼は正直な性格です。',exen:'Please tell me frankly.',ex2en:'He has an honest personality.',week:7},
+{no:723,pos:'a',kr:'소중하다',hanja:'所重～',ja:'大切だ、貴重だ',note:'',ex:'저에게 소중한 사람이에요.',exja:'私にとって大切な人です。',ex2:'소중한 시간을 함께했어요.',exja2:'大切な時間を共にしました。',exen:'You\'re a precious person to me.',ex2en:'We spent precious time together.',week:7},
+{no:724,pos:'a',kr:'솔직하다',hanja:'率直～',ja:'率直だ、正直だ',note:'',ex:'솔직하게 말해 주세요.',exja:'率直に言ってください。',ex2:'그는 솔직한 성격이에요.',exja2:'彼は正直な性格です。',exen:'Please tell me frankly.',ex2en:'He has an honest personality.',week:7},
 {no:725,pos:'a',kr:'수많다',ja:'数多い',note:'',ex:'수많은 사람들이 모였어요.',exja:'数多くの人々が集まりました。',ex2:'수많은 시행착오를 겪었어요.',exja2:'数多くの試行錯誤を経験しました。',exen:'Countless people gathered.',ex2en:'I went through countless trial and error.',week:7},
 {no:726,pos:'a',kr:'시끄럽다',irr:'「ㅂ」不規則: 시끄럽다→시끄러워요',ja:'うるさい',note:'',ex:'밖이 너무 시끄러워요.',exja:'外がとてもうるさいです。',ex2:'시끄러운 소리에 잠을 깼어요.',exja2:'うるさい音で目が覚めました。',exen:'It\'s very noisy outside.',ex2en:'I woke up from the noisy sound.',week:7},
 {no:727,pos:'a',kr:'시원하다',ja:'涼しい、さっぱりしている',note:'',ex:'바람이 시원해요.',exja:'風が涼しいです。',ex2:'국물이 시원해요.',exja2:'スープがさっぱりしています。',exen:'The wind is cool.',ex2en:'The broth is refreshing.',week:7},
@@ -946,7 +983,7 @@ const WORDS = [
 {no:733,pos:'a',kr:'얕다',ja:'浅い',note:'',ex:'이 강은 물이 얕아요.',exja:'この川は水が浅いです。',ex2:'생각이 얕았어요.',exja2:'考えが浅かったです。',exen:'This river is shallow.',ex2en:'My thinking was shallow.',week:7},
 {no:734,pos:'a',kr:'엄청나다',ja:'とてつもない、すさまじい',note:'',ex:'엄청난 비가 내렸어요.',exja:'とてつもない雨が降りました。',ex2:'엄청나게 놀랐어요.',exja2:'ものすごく驚きました。',exen:'Tremendous rain fell.',ex2en:'I was absolutely astonished.',week:7},
 {no:735,pos:'a',kr:'이르다',irr:'「르」不規則: 이르다→일러요',ja:'早い',note:'同形の動詞「이르다（至る、告げる）」とは別語。',ex:'아직 포기하기엔 일러요.',exja:'まだあきらめるには早いです。',ex2:'시간이 너무 일러요.',exja2:'時間が早すぎます。',exen:'It\'s still too early to give up.',ex2en:'It\'s too early.',week:7},
-{no:736,pos:'a',kr:'자세하다',ja:'詳しい',note:'',ex:'자세하게 설명해 주세요.',exja:'詳しく説明してください。',ex2:'자세한 내용은 나중에 알려 드릴게요.',exja2:'詳しい内容は後でお知らせします。',exen:'Please explain it in detail.',ex2en:'I\'ll let you know the details later.',week:7},
+{no:736,pos:'a',kr:'자세하다',hanja:'仔細～',ja:'詳しい',note:'',ex:'자세하게 설명해 주세요.',exja:'詳しく説明してください。',ex2:'자세한 내용은 나중에 알려 드릴게요.',exja2:'詳しい内容は後でお知らせします。',exen:'Please explain it in detail.',ex2en:'I\'ll let you know the details later.',week:7},
 {no:737,pos:'n',kr:'조사',hanja:'調査',ja:'調査',note:'',ex:'설문 조사를 했어요.',exja:'アンケート調査をしました。',ex2:'조사 결과를 발표했어요.',exja2:'調査結果を発表しました。',exen:'I conducted a survey.',ex2en:'I announced the survey results.',week:7},
 {no:738,pos:'n',kr:'조직',hanja:'組織',ja:'組織',note:'',ex:'이 조직은 체계적이에요.',exja:'この組織は体系的です。',ex2:'조직 문화를 개선했어요.',exja2:'組織文化を改善しました。',exen:'This organization is systematic.',ex2en:'We improved the organizational culture.',week:7},
 {no:739,pos:'n',kr:'존재',hanja:'存在',ja:'存在',note:'',ex:'그의 존재가 큰 힘이 돼요.',exja:'彼の存在が大きな力になります。',ex2:'존재 자체가 감사해요.',exja2:'存在自体がありがたいです。',exen:'His presence gives me great strength.',ex2en:'I\'m grateful for its very existence.',week:7},
@@ -1050,12 +1087,12 @@ const WORDS = [
 {no:837,pos:'a',kr:'짙다',ja:'濃い',note:'',ex:'안개가 짙게 꼈어요.',exja:'霧が濃くかかりました。',ex2:'화장이 좀 짙어요.',exja2:'化粧が少し濃いです。',exen:'The fog was thick.',ex2en:'The makeup is a bit heavy.',week:8},
 {no:838,pos:'a',kr:'차갑다',irr:'「ㅂ」不規則: 차갑다→차가워요',ja:'冷たい',note:'',ex:'손이 차가워요.',exja:'手が冷たいです。',ex2:'차가운 물을 마셨어요.',exja2:'冷たい水を飲みました。',exen:'My hands are cold.',ex2en:'I drank cold water.',week:8},
 {no:839,pos:'a',kr:'착하다',ja:'善良だ、優しい',note:'',ex:'그는 정말 착해요.',exja:'彼は本当に優しいです。',ex2:'착한 마음씨를 가졌어요.',exja2:'優しい心根を持っています。',exen:'He\'s really kind.',ex2en:'He has a gentle heart.',week:8},
-{no:840,pos:'a',kr:'철저하다',ja:'徹底的だ',note:'',ex:'준비를 철저하게 했어요.',exja:'準備を徹底的にしました。',ex2:'철저한 관리가 필요해요.',exja2:'徹底した管理が必要です。',exen:'I prepared thoroughly.',ex2en:'Thorough management is needed.',week:8},
-{no:841,pos:'a',kr:'친하다',ja:'親しい',note:'',ex:'저와 아주 친해요.',exja:'私ととても親しいです。',ex2:'친한 친구예요.',exja2:'親しい友達です。',exen:'I\'m very close with him.',ex2en:'It\'s a close friend.',week:8},
+{no:840,pos:'a',kr:'철저하다',hanja:'徹底～',ja:'徹底的だ',note:'',ex:'준비를 철저하게 했어요.',exja:'準備を徹底的にしました。',ex2:'철저한 관리가 필요해요.',exja2:'徹底した管理が必要です。',exen:'I prepared thoroughly.',ex2en:'Thorough management is needed.',week:8},
+{no:841,pos:'a',kr:'친하다',hanja:'親～',ja:'親しい',note:'',ex:'저와 아주 친해요.',exja:'私ととても親しいです。',ex2:'친한 친구예요.',exja2:'親しい友達です。',exen:'I\'m very close with him.',ex2en:'It\'s a close friend.',week:8},
 {no:842,pos:'a',kr:'커다랗다',irr:'「ㅎ」不規則: 커다랗다→커다래요',ja:'非常に大きい',note:'',ex:'커다란 나무가 있어요.',exja:'大きな木があります。',ex2:'커다란 가방을 멨어요.',exja2:'大きなかばんを背負いました。',exen:'There\'s a huge tree.',ex2en:'I carried a big bag.',week:8},
 {no:843,pos:'a',kr:'틀림없다',ja:'間違いない',note:'',ex:'그의 말이 틀림없어요.',exja:'彼の言葉は間違いありません。',ex2:'틀림없이 성공할 거예요.',exja2:'間違いなく成功するでしょう。',exen:'His words are certainly true.',ex2en:'It will surely succeed.',week:8},
 {no:844,pos:'a',kr:'푸르다',irr:'「러」不規則: 푸르다→푸르러요',ja:'青い',note:'',ex:'하늘이 푸르러요.',exja:'空が青いです。',ex2:'산이 푸르게 우거졌어요.',exja2:'山が青々と茂りました。',exen:'The sky is blue.',ex2en:'The mountain turned lush green.',week:8},
-{no:845,pos:'a',kr:'풍부하다',ja:'豊富だ',note:'',ex:'자원이 풍부해요.',exja:'資源が豊富です。',ex2:'경험이 풍부한 사람이에요.',exja2:'経験が豊富な人です。',exen:'Resources are abundant.',ex2en:'He\'s a person with rich experience.',week:8},
+{no:845,pos:'a',kr:'풍부하다',hanja:'豊富～',ja:'豊富だ',note:'',ex:'자원이 풍부해요.',exja:'資源が豊富です。',ex2:'경험이 풍부한 사람이에요.',exja2:'経験が豊富な人です。',exen:'Resources are abundant.',ex2en:'He\'s a person with rich experience.',week:8},
 {no:846,pos:'a',kr:'하얗다',irr:'「ㅎ」不規則: 하얗다→하얘요',ja:'白い',note:'',ex:'눈이 하얗게 쌓였어요.',exja:'雪が白く積もりました。',ex2:'얼굴이 하얘요.',exja2:'顔が白いです。',exen:'Snow piled up white.',ex2en:'Her face is fair.',week:8},
 {no:847,pos:'a',kr:'흔하다',ja:'ありふれている、よくある',note:'',ex:'이런 일은 흔해요.',exja:'こういうことはよくあります。',ex2:'흔하지 않은 경험이었어요.',exja2:'珍しい経験でした。',exen:'This kind of thing happens often.',ex2en:'It was a rare experience.',week:8},
 {no:848,pos:'a',kr:'힘차다',ja:'力強い',note:'',ex:'힘차게 응원했어요.',exja:'力強く応援しました。',ex2:'힘찬 발걸음으로 걸었어요.',exja2:'力強い足取りで歩きました。',exen:'I cheered them on powerfully.',ex2en:'I walked with a powerful stride.',week:8},
@@ -1148,14 +1185,15 @@ function spkBtn(text){
 let screen='home';
 let history_stack=[];
 function nav(to, push=true){
+  if(screen==='invView'&&to!=='invView') invStop();
   if(push) history_stack.push(screen);
   screen=to;
   document.getElementById('backBtn').classList.toggle('hidden', history_stack.length===0);
   render();
   window.scrollTo(0,0);
 }
-function goBack(){ screen = history_stack.pop() || 'home'; document.getElementById('backBtn').classList.toggle('hidden', history_stack.length===0); render(); window.scrollTo(0,0);}
-function goHome(){ history_stack=[]; screen='home'; document.getElementById('backBtn').classList.add('hidden'); render(); window.scrollTo(0,0);}
+function goBack(){ if(screen==='invView') invStop(); screen = history_stack.pop() || 'home'; document.getElementById('backBtn').classList.toggle('hidden', history_stack.length===0); render(); window.scrollTo(0,0);}
+function goHome(){ if(screen==='invView') invStop(); history_stack=[]; screen='home'; document.getElementById('backBtn').classList.add('hidden'); render(); window.scrollTo(0,0);}
 document.getElementById('backBtn').onclick=goBack;
 
 const main = document.getElementById('main');
@@ -1172,6 +1210,10 @@ function render(){
   else if(screen==='memorySetup') renderMemorySetup();
   else if(screen==='memoryView') renderMemoryView();
   else if(screen==='dataManage') renderDataManage();
+  else if(screen==='wordList') renderWordList();
+  else if(screen==='invSetup') renderInvSetup();
+  else if(screen==='invView') renderInvView();
+  else if(screen==='invRank') renderInvRank();
 }
 
 /* ============ ホーム ============ */
@@ -1189,6 +1231,11 @@ function renderHome(){
         <div class="tx"><b>フラッシュカード</b><span>週・品詞・方向を選んで暗記</span></div>
         <div class="tag">壹</div>
       </div>
+      <div class="menu-card" onclick="nav('wordList')">
+        <div class="ico">☰</div>
+        <div class="tx"><b>単語一覧</b><span>単語・意味・例文を週ごとに一覧</span></div>
+        <div class="tag">覧</div>
+      </div>
       <div class="menu-card" onclick="nav('quizSetup')">
         <div class="ico">✎</div>
         <div class="tx"><b>クイズ</b><span>4択10問・自己採点式</span></div>
@@ -1204,10 +1251,15 @@ function renderHome(){
         <div class="tx"><b>神経衰弱</b><span>3×4・裏面から記憶で当てる</span></div>
         <div class="tag">肆</div>
       </div>
+      <div class="menu-card" onclick="nav('invSetup')">
+        <div class="ico">👾</div>
+        <div class="tx"><b>インベーダー</b><span>60秒で何体倒せる？・記録に挑戦</span></div>
+        <div class="tag">伍</div>
+      </div>
       <div class="menu-card" onclick="nav('dataManage')">
         <div class="ico">💾</div>
         <div class="tx"><b>データ管理</b><span>学習記録の書き出し・読み込み</span></div>
-        <div class="tag">伍</div>
+        <div class="tag">陸</div>
       </div>
     </div>
     <div class="footer-note">記録はこの端末のブラウザに保存されます。<br>ブラウザのデータを消去すると記録も消えるのでご注意ください。<br>「データ管理」から定期的な書き出しをおすすめします。</div>
@@ -1282,8 +1334,11 @@ function applyImportedStore(obj){
     mastered: obj.mastered || [],
     review: obj.review || [],
     matchBest: obj.matchBest || {},
-    lastSession: obj.lastSession || undefined
+    lastSession: obj.lastSession || undefined,
+    invRank: obj.invRank || {},
+    invSet: obj.invSet || undefined
   };
+  invSet = store.invSet || {bgm:true,se:true};
   saveStore();
   alert('読み込みが完了しました。');
   nav('dataManage', false);
@@ -1477,13 +1532,13 @@ function renderFcView(){
 
   main.innerHTML = `
     <div id="fcHeader">
-      <span>${fcIdx+1} / ${fcDeck.length}　·　${POS_LABEL[w.pos]}</span>
+      <span id="fcPos">${fcIdx+1} / ${fcDeck.length}　·　${POS_LABEL[w.pos]}</span>
       <div class="setbtns">
         <div class="setbtn" onclick="openSetModal('mastered')">覚えた${store.mastered.length}</div>
         <div class="setbtn" onclick="openSetModal('review')">復習${store.review.length}</div>
       </div>
     </div>
-    <div class="progress-bar"><i style="width:${pct}%"></i></div>
+    <input type="range" class="fc-range" min="1" max="${fcDeck.length}" value="${fcIdx+1}" step="1" aria-label="カード位置" oninput="fcSlideInput(this.value)" onchange="fcSlideChange(this.value)">
     <div class="stage">
       <div class="card-outer" id="cardOuter" onclick="cardTap(event)">
         <div class="card-inner">
@@ -1491,7 +1546,7 @@ function renderFcView(){
             <span class="cf-num">No.${w.no}</span>
             <span class="pos-badge">${POS_LABEL[w.pos]}</span>
             <div class="front-mid">${frontHtml}</div>
-            <div class="tapfoot">中央タップで裏返す ／ 左右タップ・スワイプで前後移動</div>
+            <div class="tapfoot">タップで裏返す ／ 左右の端をタップ・スワイプで前後移動</div>
           </div>
           <div class="card-face back">
             <span class="cf-num">No.${w.no}</span>
@@ -1514,8 +1569,8 @@ function cardTap(e){
   if(e.target.closest('.spk')) return; // 音声ボタンはこちらの処理をせず優先させる
   const rect = e.currentTarget.getBoundingClientRect();
   const ratio = (e.clientX - rect.left) / rect.width;
-  if(ratio < 0.33) fcNav(-1);
-  else if(ratio > 0.67) fcNav(1);
+  if(ratio < 1/6) fcNav(-1);
+  else if(ratio > 5/6) fcNav(1);
   else fcFlip();
 }
 function fcFlip(){
@@ -1766,7 +1821,8 @@ function renderMatchView(){
     <div class="mtop"><span>ペア: ${matchState.matched.length} / 6</span><span class="timer" id="mTimer">${formatTime(matchState.elapsed)}</span></div>
     <div class="legend"><span><i style="background:var(--ink2)"></i>韓国語</span><span><i style="background:var(--accent)"></i>日本語</span></div>
     <div class="mgrid">${cardsHtml}</div>
-    <div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="startMatch()">最初からやり直す</span></div>
+    ${matchState.finished?`<button class="startbtn" style="margin-top:16px;" onclick="showMatchResult()">結果を見る（次へ）</button>`:
+    `<div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="startMatch()">最初からやり直す</span></div>`}
   `;
 }
 function tapSpeedCard(i){
@@ -1799,7 +1855,12 @@ function tapSpeedCard(i){
 function finishMatch(){
   matchState.finished=true;
   clearInterval(matchState.timerHandle);
-  const t=(Date.now()-matchState.startTs)/1000;
+  matchState.finalTime=(Date.now()-matchState.startTs)/1000;
+  matchState.elapsed=matchState.finalTime;
+  renderMatchView();
+}
+function showMatchResult(){
+  const t=matchState.finalTime;
   const key='speed:'+matchCfg.weekFrom+'-'+matchCfg.weekTo;
   const prevBest=store.matchBest[key];
   const isBest = !prevBest || t<prevBest;
@@ -1906,6 +1967,285 @@ function showMemoryResult(){
     <button class="startbtn" style="margin-top:18px;" onclick="startMemory()">もう一度挑戦</button>
     <div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="nav('memorySetup')">設定に戻る</span></div>
   </div>`;
+}
+
+/* ============ フラッシュカード：スライダー ============ */
+function fcSlideInput(v){
+  const w=fcDeck[+v-1]; if(!w) return;
+  document.getElementById('fcPos').textContent=`${v} / ${fcDeck.length}　·　${w.kr}`;
+}
+function fcSlideChange(v){
+  fcIdx=Math.max(0,Math.min(fcDeck.length-1,+v-1));
+  fcFlipped=false; saveSession(); renderFcView();
+}
+
+/* ============ マッチング：結果画面 ============ */
+function showMatchResultBtn(){ showMatchResult(); }
+
+/* ============ 単語一覧 ============ */
+let listWeek=1;
+function renderWordList(){
+  titleEl.textContent='単語一覧';
+  const chips=Array.from({length:WEEKS_TOTAL},(_,i)=>i+1).map(w=>{
+    const dis=w>AVAILABLE_WEEKS;
+    return `<div class="chip ${listWeek===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="listWeek=${w};renderWordList();window.scrollTo(0,0)"`}>${w}週目</div>`;
+  }).join('');
+  const ws=WORDS.filter(w=>w.week===listWeek);
+  const rows=ws.map(w=>`<tr>
+    <td class="wl-a"><span class="wl-no">${w.no}　${POS_LABEL[w.pos]}</span><b>${w.kr}</b>${w.read?`<br><span class="wl-sub">[${w.read}]</span>`:''}${w.hanja?`<br><span class="wl-sub">〔${w.hanja}〕</span>`:''}</td>
+    <td class="wl-b">${w.ja}${w.irr?`<br><span class="wl-sub">${w.irr}</span>`:''}${w.note?`<br><span class="wl-sub">${w.note}</span>`:''}</td>
+    <td class="wl-c">${w.ex||''}<br><span class="wl-sub">${w.exja||''}</span>${w.ex2?`<div class="wl-ex2">${w.ex2}<br><span class="wl-sub">${w.exja2||''}</span></div>`:''}</td></tr>`).join('');
+  main.innerHTML=`<div class="tabrow" style="margin-bottom:10px">${chips}</div>
+    <div class="subnote" style="margin:0 0 8px">${listWeek}週目 ・ ${ws.length}語</div>
+    <table class="wl"><thead><tr><th>単語</th><th>意味</th><th>例文</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* ============ サウンド（Web Audio） ============ */
+const SND={ac:null,master:null,bgmId:null,step:0,next:0};
+let invSet=store.invSet||{bgm:true,se:true};
+function sndInit(){
+  if(!SND.ac){
+    const C=window.AudioContext||window.webkitAudioContext; if(!C) return;
+    SND.ac=new C(); SND.master=SND.ac.createGain(); SND.master.connect(SND.ac.destination);
+  }
+  if(SND.ac.state==='suspended') SND.ac.resume();
+}
+function tone(type,f0,f1,dur,vol,t0){
+  const a=SND.ac; if(!a) return;
+  t0=t0||a.currentTime;
+  const o=a.createOscillator(),g=a.createGain();
+  o.type=type; o.frequency.setValueAtTime(f0,t0);
+  if(f1) o.frequency.exponentialRampToValueAtTime(f1,t0+dur);
+  g.gain.setValueAtTime(vol,t0); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  o.connect(g); g.connect(SND.master); o.start(t0); o.stop(t0+dur+0.02);
+}
+function noiseBurst(dur,vol){
+  const a=SND.ac; if(!a) return;
+  const n=Math.floor(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+  const s=a.createBufferSource(); s.buffer=b;
+  const f=a.createBiquadFilter(); f.type='bandpass'; f.frequency.value=1800;
+  const g=a.createGain(); g.gain.setValueAtTime(vol,a.currentTime); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+dur);
+  s.connect(f); f.connect(g); g.connect(SND.master); s.start();
+}
+function seShoot(){ if(invSet.se) tone('square',1100,220,0.16,0.10); }
+function seBoom(){ if(invSet.se){ noiseBurst(0.35,0.5); tone('sawtooth',300,50,0.3,0.12); } }
+function seBuzz(){ if(invSet.se) tone('square',120,100,0.16,0.10); }
+function seEnd(){ if(invSet.se) tone('triangle',660,330,0.5,0.12); }
+function bgmStart(){
+  if(!SND.ac||!invSet.bgm||SND.bgmId) return;
+  SND.step=0; SND.next=SND.ac.currentTime+0.1;
+  SND.bgmId=setInterval(bgmSched,80);
+}
+function bgmSched(){
+  const a=SND.ac;
+  while(SND.next<a.currentTime+0.3){
+    const s=SND.step, root=[0,-2,-4,-2][Math.floor(s/16)%4], p=s%8;
+    tone('sawtooth',110*Math.pow(2,(root+[0,0,12,0,0,7,12,7][p])/12),null,0.18,0.07,SND.next);
+    tone('square',220*Math.pow(2,(root+[12,15,19,15,12,15,19,24][p])/12),null,0.12,0.035,SND.next);
+    SND.next+=0.18; SND.step++;
+  }
+}
+function bgmStop(){ if(SND.bgmId){ clearInterval(SND.bgmId); SND.bgmId=null; } }
+
+/* ============ 演出（花火・紙吹雪） ============ */
+function fxLoop(P,frames,draw){
+  const c=document.createElement('canvas');
+  c.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+  c.width=innerWidth; c.height=innerHeight; document.body.appendChild(c);
+  const g=c.getContext('2d'); let k=0;
+  (function tick(){ g.clearRect(0,0,c.width,c.height); draw(P,g,k,c); if(++k<frames) requestAnimationFrame(tick); else c.remove(); })();
+}
+function fxFire(){
+  const burst=(P,x,y)=>{ const h=Math.random()*360; for(let i=0;i<48;i++){ const a=i/48*6.283,s=2+Math.random()*3.5; P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:70,h}); } };
+  fxLoop([],260,(P,g,k,c)=>{
+    if(k%35===0&&k<200) burst(P,c.width*(.2+Math.random()*.6),c.height*(.15+Math.random()*.3));
+    P.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=.05; p.vx*=.985; p.l--;
+      if(p.l>0){ g.fillStyle=`hsla(${p.h},95%,60%,${p.l/70})`; g.beginPath(); g.arc(p.x,p.y,2.6,0,6.283); g.fill(); } });
+  });
+}
+function fxConfetti(){
+  const P=[]; for(let i=0;i<90;i++) P.push({x:Math.random()*innerWidth,y:-20-Math.random()*200,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:Math.random()*6,h:Math.random()*360,s:5+Math.random()*5});
+  fxLoop(P,220,(P,g)=>{ P.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.r+=.15; g.save(); g.translate(p.x,p.y); g.rotate(p.r); g.fillStyle=`hsl(${p.h},85%,55%)`; g.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); g.restore(); }); });
+}
+
+/* ============ インベーダー ============ */
+let invCfg={dir:'kr2ja',weekFrom:1,weekTo:1};
+let IV=null;
+const INV_EN=['👾','👾','👾','👽','🛸','🤖','👹'];
+function invKey(){ return 'inv:'+invCfg.dir+':'+invCfg.weekFrom+'-'+invCfg.weekTo; }
+function invList(){ return (store.invRank&&store.invRank[invKey()])||[]; }
+function invDate(ts){ const d=new Date(ts),p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+function invRangeHtml(){
+  const ws=Array.from({length:WEEKS_TOTAL},(_,i)=>i+1);
+  const f=ws.map(w=>{ const dis=w>AVAILABLE_WEEKS; return `<div class="chip ${invCfg.weekFrom===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="invCfg.weekFrom=${w};if(invCfg.weekTo<${w})invCfg.weekTo=${w};render()"`}>${w}週目</div>`; }).join('');
+  const t=ws.map(w=>{ const dis=w>AVAILABLE_WEEKS||w<invCfg.weekFrom; return `<div class="chip ${invCfg.weekTo===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="invCfg.weekTo=${w};render()"`}>${w}週目</div>`; }).join('');
+  return `<div class="setup-block"><h3>方向</h3><div class="tabs">
+      <div class="chip ${invCfg.dir==='kr2ja'?'active':''}" onclick="invCfg.dir='kr2ja';render()">韓国語 → 日本語</div>
+      <div class="chip ${invCfg.dir==='ja2kr'?'active':''}" onclick="invCfg.dir='ja2kr';render()">日本語 → 韓国語</div></div></div>
+    <div class="setup-block"><h3>出題範囲（◯週目〜△週目）</h3><div class="tabrow">${f}</div>
+      <div style="text-align:center;font-size:12px;color:var(--sub);margin:4px 0;">〜</div><div class="tabrow">${t}</div></div>`;
+}
+function invToggle(k){
+  invSet[k]=!invSet[k]; store.invSet=invSet; saveStore();
+  if(k==='bgm'&&IV&&!IV.over&&screen==='invView'){ invSet.bgm?bgmStart():bgmStop(); }
+}
+function invMute(k){ invToggle(k); invMuteLbl(); }
+function invMuteLbl(){
+  const b=document.getElementById('iMb'),s=document.getElementById('iMs');
+  if(b) b.classList.toggle('off',!invSet.bgm);
+  if(s) s.classList.toggle('off',!invSet.se);
+}
+function renderInvSetup(){
+  titleEl.textContent='インベーダー設定';
+  const l=invList();
+  main.innerHTML=`${invRangeHtml()}
+    <div class="setup-block"><h3>サウンド</h3><div class="tabs">
+      <div class="chip ${invSet.bgm?'active':''}" onclick="invToggle('bgm');render()">BGM ${invSet.bgm?'ON':'OFF'}</div>
+      <div class="chip ${invSet.se?'active':''}" onclick="invToggle('se');render()">効果音 ${invSet.se?'ON':'OFF'}</div></div></div>
+    <div class="subnote" style="margin-bottom:14px">制限時間60秒。インベーダーは1体10秒で降りてきます。正しい答えを選ぶと大砲で撃ち落とせます。<br>この条件の最高記録: ${l.length?l[0].n+'体':'まだありません'}</div>
+    <button class="startbtn" onclick="startInv()">スタート</button>
+    <button class="startbtn" style="margin-top:10px;background:var(--ink)" onclick="nav('invRank')">記録を見る</button>`;
+}
+function renderInvRank(){
+  titleEl.textContent='インベーダー記録';
+  main.innerHTML=`${invRangeHtml()}<div class="setup-block"><h3>上位10記録（${invCfg.dir==='kr2ja'?'韓→日':'日→韓'}・${invCfg.weekFrom}〜${invCfg.weekTo}週目）</h3>${invRankTable(invList(),null)}</div>
+    <button class="startbtn" onclick="nav('invSetup')">この条件でプレイする</button>`;
+}
+function invRankTable(list,hl){
+  if(!list.length) return '<div class="subnote">まだ記録がありません。</div>';
+  return `<table class="iv-tbl"><thead><tr><th>順位</th><th>倒した数</th><th>日付</th></tr></thead><tbody>${list.map((x,i)=>`<tr class="${x===hl?'iv-new':''}"><td>${i+1}${i===0?' 🏆':''}</td><td>${x.n} 体${x===hl?'　NEW':''}</td><td>${invDate(x.ts)}</td></tr>`).join('')}</tbody></table>`;
+}
+function invStop(){
+  if(IV&&IV.timer) clearInterval(IV.timer);
+  bgmStop();
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  IV=null;
+}
+function startInv(){
+  const pool=WORDS.filter(w=>w.week>=invCfg.weekFrom&&w.week<=invCfg.weekTo);
+  if(pool.length<4){ alert('出題範囲の単語が足りません。'); return; }
+  invStop(); sndInit();
+  try{ const u=new SpeechSynthesisUtterance('　'); u.volume=0; speechSynthesis.speak(u); }catch(e){}
+  IV={pool,queue:[],log:[],n:0,end:Date.now()+60000,over:false,done:false,cur:null,lock:false,dir:invCfg.dir,key:invKey(),timer:null};
+  nav('invView');
+  IV.timer=setInterval(invTick,200);
+  bgmStart();
+  invSpawn();
+}
+function renderInvView(){
+  titleEl.textContent='インベーダー（'+(invCfg.dir==='kr2ja'?'韓→日':'日→韓')+'）';
+  if(!IV){ nav('invSetup',false); return; }
+  main.innerHTML=`<div class="inv-phone">
+    <div class="inv-hud"><span>残り <b id="iT">60</b> 秒</span><span>撃破 <b id="iN">${IV.n}</b></span>
+      <span><span class="inv-mb" id="iMb" onclick="invMute('bgm')">BGM</span><span class="inv-mb" id="iMs" onclick="invMute('se')">SE</span></span></div>
+    <div class="inv-field" id="iF"><div class="inv-toast" id="iToast"></div><div class="inv-en" id="iE"></div><div class="inv-line"></div><div class="inv-beam" id="iBeam"></div><div class="inv-cn"><div class="inv-bar" id="iBar"></div><div class="inv-base"></div></div></div>
+    <div class="inv-panel"><div class="inv-q" id="iQ"></div><div class="inv-opts" id="iO"></div></div></div>`;
+  invMuteLbl();
+  const F=document.getElementById('iF'); F.style.setProperty('--fy',(F.clientHeight-96)+'px');
+  document.getElementById('iE').addEventListener('animationend',invLanded);
+}
+function invSpawn(){
+  if(!IV||IV.over) return;
+  if(!IV.queue.length) IV.queue=shuffleArr(IV.pool.slice());
+  const w=IV.queue.pop();
+  const sameP=IV.pool.filter(x=>x.pos===w.pos&&x.no!==w.no);
+  const dp=sameP.length>=3?sameP:IV.pool.filter(x=>x.no!==w.no);
+  const kr=IV.dir==='kr2ja';
+  const opts=shuffleArr([w,...shuffleArr(dp.slice()).slice(0,3)]).map(o=>({no:o.no,text:kr?o.ja:o.kr,read:kr?'':o.read}));
+  IV.cur={w,opts,picks:[]}; IV.lock=false;
+  document.getElementById('iQ').innerHTML=kr?`${w.kr}${w.read?`<small>[${w.read}]</small>`:''}`:w.ja;
+  document.getElementById('iO').innerHTML=opts.map((o,i)=>`<button class="inv-opt" onclick="invPick(${i})">${o.text}${o.read?`<small>[${o.read}]</small>`:''}</button>`).join('');
+  const e=document.getElementById('iE'), em=INV_EN[Math.floor(Math.random()*INV_EN.length)];
+  e.textContent=em;
+  e.style.filter=em==='👾'?`hue-rotate(${[0,70,150,220,290][Math.floor(Math.random()*5)]}deg)`:'none';
+  e.style.left=(14+Math.random()*72)+'%';
+  e.style.animation='none'; void e.offsetWidth; e.style.animation='';
+  document.getElementById('iBar').style.transform='rotate(0deg)';
+  if(kr) speakKr(w.kr);
+}
+function invLanded(){
+  if(!IV||IV.over||IV.lock) return;
+  IV.lock=true;
+  IV.log.push({w:IV.cur.w,picks:IV.cur.picks.slice(),res:'miss'});
+  seBuzz();
+  const t=document.getElementById('iToast'); t.textContent='侵略された！'; setTimeout(()=>{ if(t) t.textContent=''; },900);
+  const g=IV; setTimeout(()=>{ if(IV===g) invSpawn(); },350);
+}
+function invPick(i){
+  if(!IV||IV.over||IV.lock) return;
+  const c=IV.cur,o=c.opts[i],ok=o.no===c.w.no;
+  c.picks.push(o.text);
+  const btn=document.getElementById('iO').children[i];
+  if(!ok){ seBuzz(); btn.classList.add('ng'); setTimeout(()=>btn.classList.remove('ng'),350); return; }
+  IV.lock=true; IV.n++; document.getElementById('iN').textContent=IV.n;
+  IV.log.push({w:c.w,picks:c.picks.slice(),res:c.picks.length===1?'first':'retry'});
+  if(IV.dir==='ja2kr') speakKr(c.w.kr);
+  const g=IV;
+  invFire(()=>{ if(IV===g&&!g.over) invSpawn(); });
+}
+function invFire(cb){
+  const F=document.getElementById('iF'),E=document.getElementById('iE'),f=F.getBoundingClientRect(),r=E.getBoundingClientRect();
+  E.style.animationPlayState='paused';
+  const cx=f.width/2,cy=f.height-44,tx=r.left+r.width/2-f.left,ty=r.top+r.height/2-f.top;
+  const dx=tx-cx,dy=cy-ty,len=Math.hypot(dx,dy),ang=Math.atan2(dx,dy)*180/Math.PI;
+  document.getElementById('iBar').style.transform=`rotate(${ang}deg)`;
+  const b=document.getElementById('iBeam'); b.style.cssText=`display:block;bottom:44px;height:${len}px;transform:rotate(${ang}deg)`;
+  seShoot();
+  setTimeout(()=>{
+    b.style.display='none'; E.textContent=''; seBoom();
+    const x=document.createElement('div'); x.className='inv-boom'; x.textContent='💥'; x.style.left=tx+'px'; x.style.top=ty+'px'; F.appendChild(x);
+    setTimeout(()=>{ x.remove(); cb(); },500);
+  },180);
+}
+function invTick(){
+  if(!IV||IV.over) return;
+  const left=Math.max(0,Math.ceil((IV.end-Date.now())/1000));
+  const t=document.getElementById('iT'); if(t) t.textContent=left;
+  if(left<=0) invOver();
+}
+function invOver(){
+  IV.over=true; clearInterval(IV.timer); bgmStop(); seEnd();
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  document.getElementById('iE').style.animationPlayState='paused';
+  document.getElementById('iToast').textContent='TIME UP！';
+  document.getElementById('iO').innerHTML=`<button class="startbtn" style="grid-column:1/-1" onclick="showInvResult()">結果を見る（次へ）</button>`;
+}
+function showInvResult(){
+  const g=IV; if(!g||g.done) return; g.done=true;
+  const n=g.n;
+  store.invRank=store.invRank||{};
+  let list=store.invRank[g.key]||[];
+  const prevMax=list.length?Math.max(...list.map(x=>x.n)):0;
+  let entry=null,isBest=false,inTop=false;
+  if(n>0){
+    entry={n,ts:Date.now()};
+    isBest=n>prevMax;
+    list=list.concat([entry]).sort((a,b)=>b.n-a.n||b.ts-a.ts).slice(0,10);
+    inTop=list.includes(entry);
+    store.invRank[g.key]=list; saveStore();
+  }
+  const kr=g.dir==='kr2ja';
+  const rows=g.log.map((l,i)=>{
+    const w=l.w;
+    const q=kr?`${w.kr}${spkBtn(w.kr)}`:w.ja;
+    const a=kr?w.ja:`${w.kr}${spkBtn(w.kr)}`;
+    const sel=l.picks.length?l.picks.join(' → '):'（選択なし）';
+    const mk=l.res==='first'?'<span class="iv-ok">○</span>':l.res==='retry'?'<span class="iv-re">△</span>':'<span class="iv-ng">×</span>';
+    return `<tr><td>${i+1}</td><td>${q}</td><td>${a}</td><td>${sel}</td><td>${mk}</td></tr>`;
+  }).join('');
+  main.innerHTML=`<div style="text-align:center;padding:10px 0 14px">
+      <div style="font-size:40px">👾</div><div>倒したインベーダー</div>
+      <div style="font-size:36px;font-weight:700;margin:4px 0">${n} 体</div>
+      ${isBest?'<div style="color:var(--ok);font-weight:700">最高記録更新！</div>':inTop?'<div style="color:var(--ok);font-weight:700">上位10記録に入りました！</div>':''}</div>
+    <div class="setup-block"><h3>出題と回答の振り返り</h3>
+      <div style="overflow-x:auto"><table class="iv-tbl"><thead><tr><th>#</th><th>問題</th><th>答え</th><th>選んだ選択肢</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="5">撃破・侵略された問題はありませんでした。</td></tr>'}</tbody></table></div>
+      <div class="subnote">○ 一発で撃破　△ 間違えた後に撃破　× 侵略された</div></div>
+    <div class="setup-block"><h3>上位10記録（${g.dir==='kr2ja'?'韓→日':'日→韓'}・${invCfg.weekFrom}〜${invCfg.weekTo}週目）</h3>${invRankTable(list,entry)}</div>
+    <button class="startbtn" onclick="startInv()">もう一度挑戦</button>
+    <div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="nav('invSetup')">設定に戻る</span></div>`;
+  window.scrollTo(0,0);
+  setTimeout(()=>{ if(isBest) fxFire(); else if(inTop) fxConfetti(); },250);
 }
 
 /* ============ 初期化 ============ */
