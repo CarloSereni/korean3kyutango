@@ -4,7 +4,7 @@
 // - ネットワークが遅い／無いときはキャッシュから即表示
 // - 同じ github.io 上の他アプリのキャッシュには触れない（このアプリ専用の接頭辞だけ管理）
 const PREFIX = 'hangul3-tango-';
-const CACHE = PREFIX + 'v1';   // 下記 PRECACHE の中身を増減したときだけ数字を上げる
+const CACHE = PREFIX + 'v2';   // 下記 PRECACHE の中身を増減したときだけ数字を上げる
 const INDEX = new URL('index.html', self.registration.scope).href;
 const REQUIRED = ['index.html'];
 const OPTIONAL = ['./', 'manifest.json', 'icon-192.png', 'icon-512.png'];
