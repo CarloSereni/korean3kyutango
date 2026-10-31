@@ -1328,6 +1328,7 @@ function render(){
   else if(screen==='goalHome') renderGoalHome();
   else if(screen==='goalNew') renderGoalNew();
   else if(screen==='calendar') renderCalendar();
+  else if(screen==='dayCards') renderDayCards();
 }
 
 /* ============ ホーム ============ */
@@ -1349,6 +1350,11 @@ function renderHome(){
         <div class="ico">🗂</div>
         <div class="tx"><b>フラッシュカード</b><span>UNIT・品詞・方向を選んで暗記</span></div>
         <div class="tag">壹</div>
+      </div>
+      <div class="menu-card" onclick="openDayCards()">
+        <div class="ico">📝</div>
+        <div class="tx"><b>今日のカード</b><span>今日 ${todayCardsCount()}枚・復習とテスト</span></div>
+        <div class="tag">今</div>
       </div>
       <div class="menu-card" onclick="nav('wordList')">
         <div class="ico">☰</div>
@@ -1522,6 +1528,7 @@ function copyDataText(){
 /* ============ フラッシュカード：設定 ============ */
 let fcCfg = {week:1, pos:'all', dir:'kr2ja', order:'seq', src:'all'};
 function renderFcSetup(){
+  if(fcCfg.src==='day'){ fcCfg.src='all'; delete fcCfg.date; }
   titleEl.textContent='フラッシュカード設定';
   const weekChips = Array.from({length:WEEKS_TOTAL},(_,i)=>i+1).map(w=>{
     const dis = w>AVAILABLE_WEEKS;
@@ -1544,7 +1551,7 @@ function renderFcSetup(){
     <div class="setup-block">
       <div class="menu-card" style="padding:14px;" onclick="resumeSession()">
         <div class="ico">↺</div>
-        <div class="tx"><b>前回の続きから再開</b><span>UNIT${store.lastSession.week} ・ ${store.lastSession.idx+1}/${store.lastSession.deckNos.length}語目</span></div>
+        <div class="tx"><b>前回の続きから再開</b><span>${store.lastSession.src==='day'?dayCardsLabel(store.lastSession.date):'UNIT'+store.lastSession.week} ・ ${store.lastSession.idx+1}/${store.lastSession.deckNos.length}語目</span></div>
       </div>
     </div>` : '';
 
@@ -1594,6 +1601,7 @@ function renderFcSetup(){
 }
 
 function buildFcDeck(){
+  if(fcCfg.src==='day'){ let dp=(store.study.days[fcCfg.date]||[]).map(n=>WBY[n]).filter(Boolean); if(fcCfg.order==='rand') dp=shuffleArr(dp.slice()); return dp; }
   let pool = WORDS.filter(w=>w.week===fcCfg.week);
   if(fcCfg.pos!=='all') pool = pool.filter(w=>w.pos===fcCfg.pos);
   if(fcCfg.src==='review') pool = pool.filter(w=>isReview(w.no));
@@ -1612,7 +1620,7 @@ function startFc(){
 }
 function saveSession(){
   store.lastSession = {
-    week: fcCfg.week, pos: fcCfg.pos, dir: fcCfg.dir, order: fcCfg.order, src: fcCfg.src,
+    week: fcCfg.week, pos: fcCfg.pos, dir: fcCfg.dir, order: fcCfg.order, src: fcCfg.src, date: fcCfg.date,
     deckNos: fcDeck.map(w=>w.no), idx: fcIdx
   };
   saveStore();
@@ -1620,7 +1628,7 @@ function saveSession(){
 function resumeSession(){
   const s = store.lastSession;
   if(!s) return;
-  fcCfg = {week:s.week, pos:s.pos, dir:s.dir, order:s.order, src:s.src};
+  fcCfg = {week:s.week, pos:s.pos, dir:s.dir, order:s.order, src:s.src, date:s.date};
   fcDeck = s.deckNos.map(no=>WORDS.find(w=>w.no===no)).filter(Boolean);
   fcIdx = Math.min(s.idx, Math.max(0,fcDeck.length-1));
   fcFlipped = false;
@@ -1628,7 +1636,7 @@ function resumeSession(){
 }
 
 function renderFcView(noAuto){
-  titleEl.textContent = 'UNIT'+(fcCfg.week)+' · '+(fcCfg.pos==='all'?'全品詞':POS_LABEL[fcCfg.pos]);
+  titleEl.textContent = fcCfg.src==='day' ? (dayCardsLabel(fcCfg.date)+'の復習') : 'UNIT'+(fcCfg.week)+' · '+(fcCfg.pos==='all'?'全品詞':POS_LABEL[fcCfg.pos]);
   if(fcDeck.length===0){
     main.innerHTML = `<div class="deckdone"><div class="big">🎉</div>この条件のカードはありません。<br>（すべて覚えたセットに入っているか、条件に合う単語がありません）
     <div style="margin-top:16px;"><button class="startbtn" onclick="nav('fcSetup')">設定に戻る</button></div></div>`;
@@ -1809,6 +1817,7 @@ function closeModal(){ document.getElementById('modalRoot').innerHTML=''; if(scr
 let quizCfg={dir:'kr2ja', weekFrom:1, weekTo:1};
 let quizItems=[];
 function renderQuizSetup(){
+  quizCfg.mode=null;
   titleEl.textContent='クイズ設定';
   const weekOpts = Array.from({length:WEEKS_TOTAL},(_,i)=>i+1);
   const fromChips = weekOpts.map(w=>`<div class="chip ${quizCfg.weekFrom===w?'active':''} ${w>AVAILABLE_WEEKS?'disabled':''}" ${w>AVAILABLE_WEEKS?'':`onclick="quizCfg.weekFrom=${w};if(quizCfg.weekTo<${w})quizCfg.weekTo=${w};renderQuizSetup()"`}>${w}</div>`).join('');
@@ -1844,9 +1853,11 @@ function startQuiz(){
   nav('quizView');
 }
 function renderQuizView(){
-  titleEl.textContent='クイズ（'+(quizCfg.dir==='kr2ja'?'韓→日':'日→韓')+'）';
+  titleEl.textContent=(quizCfg.mode==='day'?(quizCfg.date===todayKey()?'今日のテスト':fmtShort(quizCfg.date)+'のテスト'):'クイズ')+'（'+(quizCfg.dir==='kr2ja'?'韓→日':'日→韓')+'）';
   const gradedCount = quizItems.filter(q=>q.graded).length;
-  const score = quizItems.filter(q=>q.graded && q.selected===q.correctNo).length*10;
+  const nQ = quizItems.length;
+  const nOk = quizItems.filter(q=>q.graded && q.selected===q.correctNo).length;
+  const score = Math.round(nOk*100/nQ);
   const itemsHtml = quizItems.map((q,i)=>{
     const w=q.word;
     const stem = quizCfg.dir==='kr2ja'
@@ -1893,7 +1904,7 @@ function renderQuizView(){
       ${explain}
     </div>`;
   }).join('');
-  const perfect = gradedCount===10 && score===100;
+  const perfect = gradedCount===nQ && nOk===nQ;
   main.innerHTML = `${perfect?`<div style="text-align:center;background:linear-gradient(135deg,#fff6df,#fdeee9);border:1px solid #eccf9a;border-radius:14px;padding:18px;margin-bottom:14px;">
       <div style="font-size:34px;">🎉🏆🎉</div>
       <div style="font-family:'Gowun Batang',serif;font-size:19px;font-weight:700;color:var(--accent-d);margin-top:4px;">만점입니다! 축하합니다！</div>
@@ -1901,10 +1912,10 @@ function renderQuizView(){
     </div>`:''}
     ${itemsHtml}
     <div class="scorebar">
-      <span>採点済み ${gradedCount}/10　<b>${score}</b> / 100点</span>
+      <span>採点済み ${gradedCount}/${nQ}　正解${nOk}　<b>${score}</b> / 100点</span>
       <button onclick="gradeAllQuiz()">まとめて採点</button>
     </div>
-    <div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="nav('quizSetup')">条件を変えてやり直す</span></div>
+    <div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="nav('${quizCfg.mode==='day'?'dayCards':'quizSetup'}')">条件を変えてやり直す</span></div>
   `;
 }
 function selectOpt(i,no){
@@ -2526,25 +2537,35 @@ function dayCountInRange(k,from,to){
 function goalLabel(g){ return (g.from===g.to?'UNIT'+g.from:'UNIT'+g.from+'〜UNIT'+g.to)+' ・ '+g.pn+PU_LABEL[g.pu]+' ・ '+g.laps+'周'; }
 
 /* 1つの目標の進捗を、開始日から今日まで1日ずつ再現する。
+   進むのは「その周でまだ数えていない単語」を勉強したときだけ。範囲の全単語を1回ずつ数え終えると1周完了し、次の周は数え直し。
    その日の目標 = 残り単語数 ÷ 残り日数（切り上げ）。休んだ分は自動で翌日以降に上乗せされる。 */
 function simGoal(g,today){
   const size=rangeCount(g.from,g.to), total=size*g.laps;
-  const r={g,size,total,days:[],byDate:{},done:0,pct:0,completed:false,completedOn:null,status:'active',todayTarget:0,todayCount:0,daysLeft:0};
+  const r={g,size,total,days:[],byDate:{},done:0,pct:0,completed:false,completedOn:null,status:'active',todayTarget:0,todayCount:0,daysLeft:0,lap:1,lapDone:0};
   if(g.start>today){ r.status='upcoming'; r.daysLeft=dayNum(g.end)-dayNum(g.start)+1; return r; }
   const last=g.end<today?g.end:today;
-  let cum=0;
+  let cum=0, lap=1; const lapSet=new Set();
   for(let k=g.start;k<=last;k=addDays(k,1)){
     if(cum>=total) break;
     const left=dayNum(g.end)-dayNum(k)+1;
     const target=Math.min(size,Math.ceil((total-cum)/left));
-    const raw=dayCountInRange(k,g.from,g.to);
-    const eff=Math.min(raw,total-cum);
-    cum+=eff;
-    const e={date:k,count:raw,eff,target,achieved:eff>=target,cumAfter:cum};
+    const list=(store.study.days[k]||[]).filter(no=>{ const u=WMAP[no]; return u>=g.from && u<=g.to; });
+    const used=new Set(); let dayNew=0, progress=true;
+    while(progress && cum<total){
+      progress=false;
+      for(let i=0;i<list.length && cum<total;i++){
+        const no=list[i];
+        if(used.has(no) || lapSet.has(no)) continue;
+        lapSet.add(no); used.add(no); cum++; dayNew++; progress=true;
+        if(lapSet.size>=size){ lapSet.clear(); lap++; }
+      }
+    }
+    const e={date:k,count:dayNew,target,achieved:dayNew>=target,cumAfter:cum};
     r.days.push(e); r.byDate[k]=e;
     if(cum>=total){ r.completed=true; r.completedOn=k; }
   }
   r.done=cum;
+  r.lap=Math.min(lap,g.laps); r.lapDone=r.completed?size:lapSet.size;
   r.pct=total?Math.min(100,Math.floor(cum/total*100)):0;
   if(r.completed) r.status='completed';
   else if(today>g.end) r.status='expired';
@@ -2640,8 +2661,8 @@ function renderGoalHome(){
     if(s.status==='active'){
       const tp=s.todayTarget?Math.min(100,Math.floor(s.todayCount/s.todayTarget*100)):0;
       const tAch=s.todayCount>=s.todayTarget;
-      info=`<b>${s.done}</b> / ${s.total}語　残り<b>${s.total-s.done}</b>語・<b>${s.daysLeft}</b>日<br>
-        今日の目標 <b>${s.todayTarget}</b>語（今日 <b>${s.todayCount}</b>語）${tAch?' ✅':''}
+      info=`${s.lap}周目 <b>${s.lapDone}</b>/${s.size}語　全体 <b>${s.done}</b>/${s.total}語<br>残り<b>${s.daysLeft}</b>日<br>
+        今日の新しい単語 <b>${s.todayCount}</b> / 目標<b>${s.todayTarget}</b>語${tAch?' ✅':''}
         <div class="gbar"><i class="${tAch?'ok':''}" style="width:${tp}%"></i></div>`;
     } else if(s.status==='upcoming'){
       info=`${fmtDate(g.start)}から開始<br>全${s.total}語（1日あたり約${Math.ceil(s.total/s.daysLeft)}語）`;
@@ -2667,7 +2688,7 @@ function renderGoalHome(){
 
   main.innerHTML=`
     <div class="setup-block"><h3>学習の記録</h3><div class="gtiles">${tiles}</div>
-      <div class="subnote">${todayMsg}<br>「勉強した日」＝その日にフラッシュカードを2枚以上裏返した日。<br>「目標到達日」＝その日有効な目標すべてで、当日の目標数に届いた日。</div></div>
+      <div class="subnote">${todayMsg}<br>「勉強した日」＝その日にフラッシュカードを2枚以上裏返した日。<br>「目標到達日」＝その日有効な目標すべてで、当日の目標数に届いた日。<br>目標が進むのは、範囲内の「新しい単語」（その周でまだ数えていない単語）をめくったときだけです。</div></div>
     <div class="setup-block"><h3>目標（${cur.length}件）</h3>
       ${cur.map(card).join('') || '<div class="subnote">進行中の目標はありません。下のボタンから設定しましょう。</div>'}
       <button class="startbtn" onclick="openGoalNew()">＋ 目標を追加</button></div>
@@ -2728,7 +2749,7 @@ function renderGoalNew(){
         期間：${fmtDate(goalCfg.start)} 〜 ${fmtDate(pv.end)}（${pv.days}日間）<br>
         ${pv.valid?`1日あたり目安：約<b>${pv.per}</b>語`:`<span class="err">期間が短すぎます。同じ単語は1日1回までなので、周回数（${goalCfg.laps}周）以上の日数が必要です。</span>`}
       </div>
-      <div class="subnote">・数えるのは、範囲内の単語をフラッシュカードで裏返した数です（同じ単語は1日1回まで）。別の日にもう一度めくると次の周としてカウントされます。<br>
+      <div class="subnote">・進むのは、範囲内の「その周でまだ数えていない単語」をフラッシュカードで裏返したときだけです。同じ周の中で前に勉強した単語をめくり直しても進みません。範囲の全単語を1回ずつ勉強すると1周完了で、次の周は数え直しになります。<br>
       ・1日の目標は毎日「残りの単語数 ÷ 残りの日数」で再計算されます。休んだ分は翌日以降に自動で上乗せされます。<br>
       ・目標は複数同時に設定できます。</div></div>
     <button class="startbtn" ${pv.valid?'':'disabled'} onclick="saveGoal()">この目標で始める</button>`;
@@ -2769,11 +2790,11 @@ function renderCalendar(){
   let det='';
   if(calSel){
     const nos=days[calSel]||[], info=dayInfo(calSel,st.sims);
-    const rows=info.items.map(i=>`<div>${i.e.achieved?'✅':(calSel<today?'❌':'⏳')} ${goalLabel(i.g)}：目標 <b>${i.e.target}</b>語 ／ 実績 <b>${i.e.count}</b>語</div>`).join('');
+    const rows=info.items.map(i=>`<div>${i.e.achieved?'✅':(calSel<today?'❌':'⏳')} ${goalLabel(i.g)}：目標 <b>${i.e.target}</b>語 ／ 新しい単語 <b>${i.e.count}</b>語</div>`).join('');
     det=`<div class="cal-det"><h4>${fmtDate(calSel)}</h4>
       学習した単語：<b>${nos.length}</b>語　${nos.length>=2?'（勉強した日 ✅）':'（勉強日の条件は2枚以上）'}
       ${rows?`<div style="margin-top:6px">${rows}</div>`:'<div style="margin-top:6px;color:var(--sub)">この日に有効な目標はありません。</div>'}
-      ${nos.length?`<div class="cal-words">${nos.map(n=>WBY[n]).filter(Boolean).map(w=>`<span>${w.kr} <small>${w.ja}</small></span>`).join('')}</div>`:''}</div>`;
+      ${nos.length?`<div class="cal-words">${nos.map(n=>WBY[n]).filter(Boolean).map(w=>`<span>${w.kr} <small>${w.ja}</small></span>`).join('')}</div><button class="startbtn" style="margin-top:10px" onclick="openDayCards('${calSel}')">この日のカードを復習・テスト</button>`:''}</div>`;
   }
   main.innerHTML=`
     <div class="cal-head"><button onclick="calMove(-1)">‹</button><b>${calY}年 ${calM+1}月</b><button onclick="calMove(1)">›</button></div>
@@ -2781,6 +2802,59 @@ function renderCalendar(){
     <div class="cal-leg"><span><i style="background:var(--ok-bg);border-color:var(--ok)"></i>目標到達</span><span><i style="background:#e8eef7"></i>勉強した日</span><span><i style="background:#fbe9e6"></i>目標未達</span><span>数字＝その日にめくった単語数</span></div>
     ${det}
     <div class="subnote" style="margin-top:14px">${calM+1}月：勉強した日 <b>${mStudy}</b>日 ／ 目標到達 <b>${mAch}</b>日 ／ 合計 <b>${mWords}</b>語</div>`;
+}
+
+/* ============ 今日（または過去の日）のカード：復習・テスト ============ */
+let dayCfg={dir:'kr2ja',order:'seq',n:10};
+let dayCardsDate=todayKey();
+function dayCardsLabel(date){ return date===todayKey()?'今日のカード':fmtShort(date)+'のカード'; }
+function todayCardsCount(){ return (store.study.days[todayKey()]||[]).filter(n=>WBY[n]).length; }
+function openDayCards(date){ dayCardsDate=date||todayKey(); nav('dayCards'); }
+function dayCardNos(){ return (store.study.days[dayCardsDate]||[]).filter(n=>WBY[n]); }
+function renderDayCards(){
+  titleEl.textContent=dayCardsLabel(dayCardsDate);
+  const nos=dayCardNos(), cnt=nos.length;
+  if(!cnt){
+    main.innerHTML=`<div class="deckdone"><div class="big">📭</div>${dayCardsDate===todayKey()?'今日はまだカードをめくっていません。':fmtDate(dayCardsDate)+'に勉強したカードはありません。'}<br>フラッシュカードをめくると、ここに記録されます。</div>`;
+    return;
+  }
+  const byU={}; nos.forEach(n=>{ const u=WBY[n].week; byU[u]=(byU[u]||0)+1; });
+  const brk=Object.keys(byU).sort((a,b)=>a-b).map(u=>`UNIT${u}：${byU[u]}枚`).join('　');
+  const q=dayCfg.n==='all'?cnt:Math.min(dayCfg.n,cnt);
+  const dirC=['kr2ja','ja2kr'].map(d=>`<div class="chip ${dayCfg.dir===d?'active':''}" onclick="dayCfg.dir='${d}';renderDayCards()">${d==='kr2ja'?'韓国語 → 日本語':'日本語 → 韓国語'}</div>`).join('');
+  const ordC=[['seq','めくった順'],['rand','ランダム']].map(o=>`<div class="chip ${dayCfg.order===o[0]?'active':''}" onclick="dayCfg.order='${o[0]}';renderDayCards()">${o[1]}</div>`).join('');
+  const nC=[10,20,'all'].map(v=>`<div class="chip ${dayCfg.n===v?'active':''}" onclick="dayCfg.n=${v==='all'?"'all'":v};renderDayCards()">${v==='all'?'全部':v+'問'}</div>`).join('');
+  main.innerHTML=`
+    <div class="setup-block"><div class="prev-box" style="text-align:center"><div style="font-size:12px">${fmtDate(dayCardsDate)}</div>
+      <div style="font-size:26px;font-weight:700;color:var(--ink)">${cnt}<small style="font-size:13px;font-weight:400">枚</small></div>
+      <div style="font-size:11.5px;color:var(--sub)">${brk}</div></div></div>
+    <div class="setup-block"><h3>方向</h3><div class="tabs">${dirC}</div></div>
+    <div class="setup-block"><h3>🗂 復習（フラッシュカード）</h3>
+      <div class="tabs">${ordC}</div>
+      <button class="startbtn" onclick="startDayReview()">このカードを復習する（${cnt}枚）</button></div>
+    <div class="setup-block"><h3>✎ テスト（4択）</h3>
+      <div class="tabs">${nC}</div>
+      <button class="startbtn" style="background:var(--ink2)" onclick="startDayQuiz()">テストする（${q}問）</button>
+      <div class="subnote">問題はこの日のカードから出題し、まちがいの選択肢は同じ品詞の他の単語から選びます。</div></div>`;
+}
+function startDayReview(){
+  fcCfg={week:1,pos:'all',dir:dayCfg.dir,order:dayCfg.order,src:'day',date:dayCardsDate};
+  fcDeck=buildFcDeck(); fcIdx=0; fcFlipped=false;
+  saveSession(); nav('fcView');
+}
+function startDayQuiz(){
+  const nos=dayCardNos(); if(!nos.length) return;
+  const q=dayCfg.n==='all'?nos.length:Math.min(dayCfg.n,nos.length);
+  const picks=shuffleArr(nos.map(n=>WBY[n])).slice(0,q);
+  quizCfg.dir=dayCfg.dir; quizCfg.mode='day'; quizCfg.date=dayCardsDate;
+  quizItems=picks.map(w=>{
+    const sameP=WORDS.filter(x=>x.pos===w.pos && x.no!==w.no);
+    const dp=sameP.length>=3?sameP:WORDS.filter(x=>x.no!==w.no);
+    const dist=shuffleArr(dp.slice()).slice(0,3);
+    const opts=shuffleArr([w,...dist].map(o=>({no:o.no,text:quizCfg.dir==='kr2ja'?o.ja:o.kr,read:o.read})));
+    return {word:w,opts,correctNo:w.no,selected:null,graded:false};
+  });
+  nav('quizView');
 }
 
 /* ============ 初期化 ============ */
