@@ -232,6 +232,79 @@ table.wl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
 .iv-tbl .spk{width:32px;height:32px;font-size:15px;margin-left:4px;}
 .iv-new{background:#fff3c4;}
 .iv-ok{color:#1f9d55;font-weight:700;}.iv-ng{color:#d33;font-weight:700;}.iv-re{color:#c98a00;font-weight:700;}
+input,textarea{-webkit-user-select:text;user-select:text;}
+.sbar{display:flex;gap:8px;margin:0 0 16px;}
+.sbar input{flex:1;min-width:0;padding:11px 12px;border:1px solid var(--line2);border-radius:10px;font-size:15px;background:#fff;color:var(--ink);font-family:inherit;}
+.sbar button{padding:0 18px;border:none;border-radius:10px;background:var(--ink);color:#fff;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;}
+.sres{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow);}
+.sres .u{font-size:10.5px;color:#fff;background:var(--ink2);border-radius:6px;padding:2px 7px;flex-shrink:0;white-space:nowrap;}
+.sres .k{font-family:'Gowun Batang','Noto Serif KR',serif;font-size:17px;font-weight:700;}
+.sres .k small{font-family:inherit;font-size:11.5px;color:var(--sub);font-weight:400;margin-left:4px;}
+.sres .j{font-size:13px;color:var(--ink2);margin-top:1px;}
+.sres .p{margin-left:auto;font-size:10.5px;color:var(--sub);flex-shrink:0;}
+.home-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px;cursor:pointer;}
+.home-sum div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center;box-shadow:var(--shadow);}
+.home-sum b{display:block;font-size:19px;color:var(--ink);}
+.home-sum span{font-size:10.5px;color:var(--sub);}
+.gtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
+.gtile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;box-shadow:var(--shadow);}
+.gtile b{display:block;font-size:22px;color:var(--ink);line-height:1.2;}
+.gtile b small{font-size:11px;font-weight:400;color:var(--sub);margin-left:1px;}
+.gtile span{display:block;font-size:10px;color:var(--sub);line-height:1.3;margin-top:2px;}
+.gtile.g b{color:var(--ok);}
+.goal-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+.goal-card .gh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.goal-card .gt{font-size:15px;font-weight:700;}
+.goal-card .gs{font-size:11.5px;color:var(--sub);margin-top:2px;line-height:1.5;}
+.goal-card .gx{border:1px solid var(--line2);background:#fff;border-radius:8px;padding:3px 9px;font-size:12px;cursor:pointer;color:var(--sub);flex-shrink:0;}
+.goal-card .gb{display:flex;align-items:center;gap:14px;margin-top:10px;}
+.goal-card .gi{flex:1;font-size:12.5px;color:var(--ink2);line-height:1.7;}
+.goal-card .gi b{color:var(--ink);}
+.gbar{height:9px;background:var(--line);border-radius:5px;overflow:hidden;margin:4px 0 2px;}
+.gbar i{display:block;height:100%;background:var(--ink2);border-radius:5px;}
+.gbar i.ok{background:var(--ok);}
+.gbadge{display:inline-block;font-size:10.5px;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle;}
+.gbadge.ok{background:var(--ok-bg);color:var(--ok);}
+.gbadge.ng{background:#eee9df;color:var(--sub);}
+.gbadge.up{background:var(--keep-bg);color:var(--keep);}
+.num-in,.date-in{padding:9px 10px;border:1px solid var(--line2);border-radius:10px;font-size:15px;background:#fff;color:var(--ink);font-family:inherit;}
+.num-in{width:84px;}
+.row-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.prev-box{background:var(--paper);border:1px dashed var(--line2);border-radius:12px;padding:12px;font-size:13px;line-height:1.7;color:var(--ink2);}
+.prev-box b{color:var(--ink);}
+.prev-box .err{color:var(--accent);font-weight:700;}
+.chart14{display:flex;align-items:flex-end;gap:4px;height:100px;padding-top:4px;}
+.chart14 .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0;}
+.chart14 .bar{width:100%;border-radius:4px 4px 0 0;background:#c9c2b3;min-height:2px;}
+.chart14 .bar.s{background:var(--ink2);}
+.chart14 .bar.a{background:var(--ok);}
+.chart14 .v{font-size:9px;color:var(--sub);height:12px;line-height:12px;}
+.chart14 .l{font-size:9px;color:var(--sub);margin-top:2px;}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-head b{font-family:'Gowun Batang','Noto Serif KR',serif;font-size:18px;}
+.cal-head button{width:38px;height:34px;border:1px solid var(--line2);background:#fff;border-radius:8px;font-size:15px;cursor:pointer;color:var(--ink);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-dow{text-align:center;font-size:10.5px;color:var(--sub);padding:2px 0;}
+.cal-cell{aspect-ratio:1/1.12;border:1px solid var(--line);border-radius:8px;background:#fff;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.cal-cell.empty{border:none;background:none;cursor:default;}
+.cal-cell .cd{position:absolute;top:2px;left:4px;font-size:10px;color:var(--sub);}
+.cal-cell .cn{font-size:15px;font-weight:700;color:var(--ink);margin-top:6px;}
+.cal-cell .cm{position:absolute;bottom:1px;right:3px;font-size:10px;color:var(--ok);font-weight:700;}
+.cal-cell.st{background:#e8eef7;border-color:#c5d2e6;}
+.cal-cell.ach{background:var(--ok-bg);border-color:var(--ok);}
+.cal-cell.miss{background:#fbe9e6;border-color:#e9b9b0;}
+.cal-cell.fut{opacity:.55;}
+.cal-cell.today{outline:2px solid var(--accent);outline-offset:-1px;}
+.cal-cell.sel{box-shadow:0 0 0 2px var(--ink);}
+.cal-leg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--sub);margin:10px 0 14px;}
+.cal-leg span{display:inline-flex;align-items:center;gap:5px;}
+.cal-leg i{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid var(--line2);}
+.cal-det{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7;color:var(--ink2);}
+.cal-det h4{margin:0 0 6px;font-size:14.5px;color:var(--ink);}
+.cal-words{max-height:150px;overflow-y:auto;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line2);font-size:12px;}
+.cal-words span{display:inline-block;margin:0 10px 3px 0;white-space:nowrap;}
+.cal-words small{color:var(--sub);}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:700;z-index:90;max-width:90%;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.25);}
 </style>
 </head>
 <body>
@@ -239,7 +312,7 @@ table.wl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
   <div id="topbar">
     <div class="back" id="backBtn" onclick="goHome()">←</div>
     <h1 id="pageTitle">단어장</h1>
-    <div class="stamp">전 8주</div>
+    <div class="stamp">전 8 UNIT</div>
   </div>
   <div id="main"></div>
 </div>
@@ -1168,6 +1241,10 @@ function normStore(o){
   o.mastered = normDirSets(o.mastered);
   o.review = normDirSets(o.review);
   if(!o.matchBest) o.matchBest = {};
+  if(!o.study || typeof o.study!=='object') o.study = {};
+  if(!o.study.days || typeof o.study.days!=='object' || Array.isArray(o.study.days)) o.study.days = {};
+  if(!Array.isArray(o.goals)) o.goals = [];
+  o.goals = o.goals.filter(g=>g && typeof g==='object' && /^\d{4}-\d{2}-\d{2}$/.test(g.start||'') && /^\d{4}-\d{2}-\d{2}$/.test(g.end||'') && g.from>=1 && g.to>=g.from && g.laps>=1);
   return o;
 }
 let store;
@@ -1247,6 +1324,10 @@ function render(){
   else if(screen==='invSetup') renderInvSetup();
   else if(screen==='invView') renderInvView();
   else if(screen==='invRank') renderInvRank();
+  else if(screen==='searchView') renderSearchView();
+  else if(screen==='goalHome') renderGoalHome();
+  else if(screen==='goalNew') renderGoalNew();
+  else if(screen==='calendar') renderCalendar();
 }
 
 /* ============ ホーム ============ */
@@ -1256,18 +1337,33 @@ function renderHome(){
     <div class="hero">
       <div class="eyebrow">한글 3급 단어</div>
       <h2>ハングル単語帳</h2>
-      <p>全8週・896語 収録</p>
+      <p>全8UNIT・896語 収録</p>
     </div>
+    <div class="sbar">
+      <input id="homeQ" type="search" placeholder="単語を検索（韓国語・日本語）" onkeydown="if(event.key==='Enter')homeSearch()">
+      <button onclick="homeSearch()">検索</button>
+    </div>
+    ${homeSummaryHtml()}
     <div class="menu-grid">
       <div class="menu-card" onclick="nav('fcSetup')">
         <div class="ico">🗂</div>
-        <div class="tx"><b>フラッシュカード</b><span>週・品詞・方向を選んで暗記</span></div>
+        <div class="tx"><b>フラッシュカード</b><span>UNIT・品詞・方向を選んで暗記</span></div>
         <div class="tag">壹</div>
       </div>
       <div class="menu-card" onclick="nav('wordList')">
         <div class="ico">☰</div>
-        <div class="tx"><b>単語一覧</b><span>単語・意味・例文を週ごとに一覧</span></div>
+        <div class="tx"><b>単語一覧</b><span>単語・意味・例文をUNITごとに一覧</span></div>
         <div class="tag">覧</div>
+      </div>
+      <div class="menu-card" onclick="nav('goalHome')">
+        <div class="ico">🎯</div>
+        <div class="tx"><b>目標・記録</b><span>目標設定・到達度・連続日数</span></div>
+        <div class="tag">標</div>
+      </div>
+      <div class="menu-card" onclick="openCalendar()">
+        <div class="ico">📅</div>
+        <div class="tx"><b>カレンダー</b><span>毎日の学習単語数と目標到達</span></div>
+        <div class="tag">暦</div>
       </div>
       <div class="menu-card" onclick="nav('quizSetup')">
         <div class="ico">✎</div>
@@ -1368,7 +1464,9 @@ function applyImportedStore(obj){
     lastSession: obj.lastSession || undefined,
     invRank: obj.invRank || {},
     invSet: obj.invSet || undefined,
-    fcAuto: obj.fcAuto
+    fcAuto: obj.fcAuto,
+    study: obj.study,
+    goals: obj.goals
   });
   invSet = store.invSet || {bgm:true,se:true};
   saveStore();
@@ -1427,7 +1525,7 @@ function renderFcSetup(){
   titleEl.textContent='フラッシュカード設定';
   const weekChips = Array.from({length:WEEKS_TOTAL},(_,i)=>i+1).map(w=>{
     const dis = w>AVAILABLE_WEEKS;
-    return `<div class="chip ${fcCfg.week===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="fcCfg.week=${w};renderFcSetup()"`}>${w}週目${dis?'<small>準備中</small>':''}</div>`;
+    return `<div class="chip ${fcCfg.week===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="fcCfg.week=${w};renderFcSetup()"`}>UNIT${w}${dis?'<small>準備中</small>':''}</div>`;
   }).join('');
 
   const posSet = [...new Set(WORDS.filter(w=>w.week===fcCfg.week).map(w=>w.pos))];
@@ -1446,14 +1544,14 @@ function renderFcSetup(){
     <div class="setup-block">
       <div class="menu-card" style="padding:14px;" onclick="resumeSession()">
         <div class="ico">↺</div>
-        <div class="tx"><b>前回の続きから再開</b><span>${store.lastSession.week}週目 ・ ${store.lastSession.idx+1}/${store.lastSession.deckNos.length}語目</span></div>
+        <div class="tx"><b>前回の続きから再開</b><span>UNIT${store.lastSession.week} ・ ${store.lastSession.idx+1}/${store.lastSession.deckNos.length}語目</span></div>
       </div>
     </div>` : '';
 
   main.innerHTML = `
     ${resumeBlock}
     <div class="setup-block">
-      <h3>週</h3>
+      <h3>UNIT</h3>
       <div class="tabrow">${weekChips}</div>
     </div>
     <div class="setup-block">
@@ -1530,7 +1628,7 @@ function resumeSession(){
 }
 
 function renderFcView(noAuto){
-  titleEl.textContent = (fcCfg.week)+'週目 · '+(fcCfg.pos==='all'?'全品詞':POS_LABEL[fcCfg.pos]);
+  titleEl.textContent = 'UNIT'+(fcCfg.week)+' · '+(fcCfg.pos==='all'?'全品詞':POS_LABEL[fcCfg.pos]);
   if(fcDeck.length===0){
     main.innerHTML = `<div class="deckdone"><div class="big">🎉</div>この条件のカードはありません。<br>（すべて覚えたセットに入っているか、条件に合う単語がありません）
     <div style="margin-top:16px;"><button class="startbtn" onclick="nav('fcSetup')">設定に戻る</button></div></div>`;
@@ -1632,7 +1730,7 @@ function cardTap(e){
 function fcFlip(){
   fcFlipped=!fcFlipped;
   document.getElementById('cardOuter').classList.toggle('flipped');
-  if(fcFlipped) fcAutoSpeak(); else stopSpeech();
+  if(fcFlipped){ const fw=fcDeck[fcIdx]; if(fw) recordFlip(fw.no); fcAutoSpeak(); } else stopSpeech();
 }
 function fcNav(dir){
   const outer=document.getElementById('cardOuter');
@@ -1724,11 +1822,11 @@ function renderQuizSetup(){
       </div>
     </div>
     <div class="setup-block">
-      <h3>出題範囲（◯週目〜△週目）</h3>
+      <h3>出題範囲（UNIT◯〜UNIT△）</h3>
       <div class="tabrow">${fromChips}</div>
       <div style="text-align:center;font-size:12px;color:var(--sub);margin:4px 0;">〜</div>
       <div class="tabrow">${toChips}</div>
-      <div class="subnote">1〜8週目まで範囲を選んで出題できます。</div>
+      <div class="subnote">UNIT1〜UNIT8の範囲を選んで出題できます。</div>
     </div>
     <button class="startbtn" onclick="startQuiz()">10問出題する</button>
   `;
@@ -1838,7 +1936,7 @@ let matchCfg={weekFrom:1, weekTo:1};
 function renderMatchSetup(){
   titleEl.textContent='マッチングゲーム設定';
   const weekOpts = Array.from({length:WEEKS_TOTAL},(_,i)=>i+1);
-  const chips = weekOpts.map(w=>`<div class="chip ${matchCfg.weekFrom===w?'active':''} ${w>AVAILABLE_WEEKS?'disabled':''}" ${w>AVAILABLE_WEEKS?'':`onclick="matchCfg.weekFrom=${w};matchCfg.weekTo=${w};renderMatchSetup()"`}>${w}週目</div>`).join('');
+  const chips = weekOpts.map(w=>`<div class="chip ${matchCfg.weekFrom===w?'active':''} ${w>AVAILABLE_WEEKS?'disabled':''}" ${w>AVAILABLE_WEEKS?'':`onclick="matchCfg.weekFrom=${w};matchCfg.weekTo=${w};renderMatchSetup()"`}>UNIT${w}</div>`).join('');
   const bestKey = 'speed:'+matchCfg.weekFrom+'-'+matchCfg.weekTo;
   const best = store.matchBest[bestKey];
   main.innerHTML = `
@@ -1939,7 +2037,7 @@ let memoCfg={weekFrom:1, weekTo:1};
 function renderMemorySetup(){
   titleEl.textContent='神経衰弱設定';
   const weekOpts = Array.from({length:WEEKS_TOTAL},(_,i)=>i+1);
-  const chips = weekOpts.map(w=>`<div class="chip ${memoCfg.weekFrom===w?'active':''} ${w>AVAILABLE_WEEKS?'disabled':''}" ${w>AVAILABLE_WEEKS?'':`onclick="memoCfg.weekFrom=${w};memoCfg.weekTo=${w};renderMemorySetup()"`}>${w}週目</div>`).join('');
+  const chips = weekOpts.map(w=>`<div class="chip ${memoCfg.weekFrom===w?'active':''} ${w>AVAILABLE_WEEKS?'disabled':''}" ${w>AVAILABLE_WEEKS?'':`onclick="memoCfg.weekFrom=${w};memoCfg.weekTo=${w};renderMemorySetup()"`}>UNIT${w}</div>`).join('');
   const bestKey = 'memo:'+memoCfg.weekFrom+'-'+memoCfg.weekTo;
   const best = store.matchBest[bestKey];
   main.innerHTML = `
@@ -2047,7 +2145,7 @@ function renderWordList(){
   titleEl.textContent='単語一覧';
   const chips=Array.from({length:WEEKS_TOTAL},(_,i)=>i+1).map(w=>{
     const dis=w>AVAILABLE_WEEKS;
-    return `<div class="chip ${listWeek===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="listWeek=${w};renderWordList();window.scrollTo(0,0)"`}>${w}週目</div>`;
+    return `<div class="chip ${listWeek===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="listWeek=${w};renderWordList();window.scrollTo(0,0)"`}>UNIT${w}</div>`;
   }).join('');
   const ws=WORDS.filter(w=>w.week===listWeek);
   const rows=ws.map(w=>`<tr>
@@ -2055,7 +2153,7 @@ function renderWordList(){
     <td class="wl-b">${w.ja}${w.irr?`<br><span class="wl-sub">${w.irr}</span>`:''}${w.note?`<br><span class="wl-sub">${w.note}</span>`:''}</td>
     <td class="wl-c">${w.ex||''}<br><span class="wl-sub">${w.exja||''}</span>${w.ex2?`<div class="wl-ex2">${w.ex2}<br><span class="wl-sub">${w.exja2||''}</span></div>`:''}</td></tr>`).join('');
   main.innerHTML=`<div class="tabrow" style="margin-bottom:10px">${chips}</div>
-    <div class="subnote" style="margin:0 0 8px">${listWeek}週目 ・ ${ws.length}語</div>
+    <div class="subnote" style="margin:0 0 8px">UNIT${listWeek} ・ ${ws.length}語</div>
     <table class="wl"><thead><tr><th>単語</th><th>意味</th><th>例文</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
@@ -2137,12 +2235,12 @@ function invList(){ return (store.invRank&&store.invRank[invKey()])||[]; }
 function invDate(ts){ const d=new Date(ts),p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
 function invRangeHtml(){
   const ws=Array.from({length:WEEKS_TOTAL},(_,i)=>i+1);
-  const f=ws.map(w=>{ const dis=w>AVAILABLE_WEEKS; return `<div class="chip ${invCfg.weekFrom===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="invCfg.weekFrom=${w};if(invCfg.weekTo<${w})invCfg.weekTo=${w};render()"`}>${w}週目</div>`; }).join('');
-  const t=ws.map(w=>{ const dis=w>AVAILABLE_WEEKS||w<invCfg.weekFrom; return `<div class="chip ${invCfg.weekTo===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="invCfg.weekTo=${w};render()"`}>${w}週目</div>`; }).join('');
+  const f=ws.map(w=>{ const dis=w>AVAILABLE_WEEKS; return `<div class="chip ${invCfg.weekFrom===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="invCfg.weekFrom=${w};if(invCfg.weekTo<${w})invCfg.weekTo=${w};render()"`}>UNIT${w}</div>`; }).join('');
+  const t=ws.map(w=>{ const dis=w>AVAILABLE_WEEKS||w<invCfg.weekFrom; return `<div class="chip ${invCfg.weekTo===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="invCfg.weekTo=${w};render()"`}>UNIT${w}</div>`; }).join('');
   return `<div class="setup-block"><h3>方向</h3><div class="tabs">
       <div class="chip ${invCfg.dir==='kr2ja'?'active':''}" onclick="invCfg.dir='kr2ja';render()">韓国語 → 日本語</div>
       <div class="chip ${invCfg.dir==='ja2kr'?'active':''}" onclick="invCfg.dir='ja2kr';render()">日本語 → 韓国語</div></div></div>
-    <div class="setup-block"><h3>出題範囲（◯週目〜△週目）</h3><div class="tabrow">${f}</div>
+    <div class="setup-block"><h3>出題範囲（UNIT◯〜UNIT△）</h3><div class="tabrow">${f}</div>
       <div style="text-align:center;font-size:12px;color:var(--sub);margin:4px 0;">〜</div><div class="tabrow">${t}</div></div>`;
 }
 function invToggle(k){
@@ -2168,7 +2266,7 @@ function renderInvSetup(){
 }
 function renderInvRank(){
   titleEl.textContent='インベーダー記録';
-  main.innerHTML=`${invRangeHtml()}<div class="setup-block"><h3>上位10記録（${invCfg.dir==='kr2ja'?'韓→日':'日→韓'}・${invCfg.weekFrom}〜${invCfg.weekTo}週目）</h3>${invRankTable(invList(),null)}</div>
+  main.innerHTML=`${invRangeHtml()}<div class="setup-block"><h3>上位10記録（${invCfg.dir==='kr2ja'?'韓→日':'日→韓'}・UNIT${invCfg.weekFrom}〜UNIT${invCfg.weekTo}）</h3>${invRankTable(invList(),null)}</div>
     <button class="startbtn" onclick="nav('invSetup')">この条件でプレイする</button>`;
 }
 function invRankTable(list,hl){
@@ -2300,11 +2398,389 @@ function showInvResult(){
     <div class="setup-block"><h3>出題と回答の振り返り</h3>
       <div style="overflow-x:auto"><table class="iv-tbl"><thead><tr><th>#</th><th>問題</th><th>答え</th><th>選んだ選択肢</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="5">撃破・侵略された問題はありませんでした。</td></tr>'}</tbody></table></div>
       <div class="subnote">○ 一発で撃破　△ 間違えた後に撃破　× 侵略された</div></div>
-    <div class="setup-block"><h3>上位10記録（${g.dir==='kr2ja'?'韓→日':'日→韓'}・${invCfg.weekFrom}〜${invCfg.weekTo}週目）</h3>${invRankTable(list,entry)}</div>
+    <div class="setup-block"><h3>上位10記録（${g.dir==='kr2ja'?'韓→日':'日→韓'}・UNIT${invCfg.weekFrom}〜UNIT${invCfg.weekTo}）</h3>${invRankTable(list,entry)}</div>
     <button class="startbtn" onclick="startInv()">もう一度挑戦</button>
     <div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="nav('invSetup')">設定に戻る</span></div>`;
   window.scrollTo(0,0);
   setTimeout(()=>{ if(isBest) fxFire(); else if(inTop) fxConfetti(); },250);
+}
+
+/* ============ 日付ユーティリティ ============ */
+function pad2(n){ return String(n).padStart(2,'0'); }
+function dkey(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function todayKey(){ return dkey(new Date()); }
+function parseKey(k){ const a=k.split('-'); return new Date(+a[0],+a[1]-1,+a[2]); }
+function dayNum(k){ const a=k.split('-'); return Math.round(Date.UTC(+a[0],+a[1]-1,+a[2])/864e5); }
+function addDays(k,n){ const d=parseKey(k); d.setDate(d.getDate()+n); return dkey(d); }
+function addMonths(k,n){
+  const d=parseKey(k), day=d.getDate();
+  d.setDate(1); d.setMonth(d.getMonth()+n);
+  const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  d.setDate(Math.min(day,last));
+  return dkey(d);
+}
+const DOW=['日','月','火','水','木','金','土'];
+function fmtDate(k){ const d=parseKey(k); return d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()+'（'+DOW[d.getDay()]+'）'; }
+function fmtShort(k){ const d=parseKey(k); return (d.getMonth()+1)+'/'+d.getDate(); }
+function escHtml(t){ return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+let toastTimer=null;
+function showToast(msg,ms){
+  let t=document.getElementById('toastEl');
+  if(!t){ t=document.createElement('div'); t.id='toastEl'; t.className='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.style.display='block';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{ t.style.display='none'; },ms||2600);
+}
+
+/* ============ 単語検索 ============ */
+const WBY={}, WMAP={};
+WORDS.forEach(w=>{ WBY[w.no]=w; WMAP[w.no]=w.week; });
+function kataToHira(s){ return s.replace(/[\u30a1-\u30f6]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
+function normQ(s){ return kataToHira(String(s||'').normalize('NFC').toLowerCase()).replace(/[\s\u3000]+/g,''); }
+let SIDX=null;
+function buildSearchIndex(){
+  SIDX=WORDS.map(w=>({
+    w, kr:normQ(w.kr), read:normQ(w.read), hanja:normQ(w.hanja), ja:normQ(w.ja),
+    jaSegs:normQ(w.ja).split(/[、，,・\/／（）()]/).filter(Boolean)
+  }));
+}
+function searchWords(q){
+  q=normQ(q);
+  if(!q) return [];
+  if(!SIDX) buildSearchIndex();
+  const out=[];
+  SIDX.forEach(x=>{
+    let sc=99;
+    if(x.kr===q || x.jaSegs.includes(q)) sc=0;
+    else if(x.kr.startsWith(q) || x.ja.startsWith(q) || x.jaSegs.some(t=>t.startsWith(q))) sc=1;
+    else if(x.kr.includes(q) || x.ja.includes(q)) sc=2;
+    else if(x.read.includes(q) || x.hanja.includes(q)) sc=3;
+    if(sc<99) out.push({w:x.w,sc});
+  });
+  out.sort((a,b)=>a.sc-b.sc || a.w.no-b.w.no);
+  return out.map(o=>o.w);
+}
+let searchQ='';
+function homeSearch(){
+  const v=document.getElementById('homeQ').value;
+  if(!v.trim()){ showToast('検索する言葉を入力してください'); return; }
+  searchQ=v; nav('searchView');
+}
+function doSearch(){
+  searchQ=document.getElementById('sq').value;
+  renderSearchView();
+}
+function renderSearchView(){
+  titleEl.textContent='単語検索';
+  let body='';
+  if(!searchQ.trim()){
+    body='<div class="subnote">韓国語（ハングル）・読み・漢字語・日本語の意味で検索できます。入力して「検索」を押してください。</div>';
+  } else {
+    const res=searchWords(searchQ);
+    const shown=res.slice(0,200);
+    body=`<div class="subnote" style="margin:0 0 10px">「${escHtml(searchQ.trim())}」の検索結果：${res.length}件${res.length>200?'（先頭200件を表示）':''}</div>`+
+      (shown.map(w=>`<div class="sres" onclick="openWordModal(${w.no})">
+        <span class="u">UNIT${w.week}</span>
+        <div><div class="k">${w.kr}${w.read?`<small>[${w.read}]</small>`:''}${w.hanja?`<small>〔${w.hanja}〕</small>`:''}</div><div class="j">${w.ja}</div></div>
+        <span class="p">${POS_LABEL[w.pos]||''}</span></div>`).join('')
+       || '<div class="empty-note">見つかりませんでした。別の言葉でお試しください。</div>');
+  }
+  main.innerHTML=`<div class="sbar">
+      <input id="sq" type="search" value="${escHtml(searchQ)}" placeholder="韓国語・日本語で検索" onkeydown="if(event.key==='Enter')doSearch()">
+      <button onclick="doSearch()">検索</button></div>${body}`;
+}
+function openWordModal(no){
+  const w=WBY[no]; if(!w) return;
+  document.getElementById('modalRoot').innerHTML=`
+    <div class="modal-bg" onclick="if(event.target===this)closeModal()">
+      <div class="modal-sheet"><div class="back">
+        <div style="font-size:11px;color:var(--sub);margin-bottom:6px;">UNIT${w.week} ・ No.${w.no} ・ ${POS_LABEL[w.pos]||''}</div>
+        <div class="bhead"><span class="kr">${w.kr}${w.read?` <span style="color:var(--sub);font-size:13px;">[${w.read}]</span>`:''}</span>${spkBtn(w.kr)}${w.hanja?`<span class="hanja">〔${w.hanja}〕</span>`:''}</div>
+        <div class="ja-line">${w.ja}</div>
+        ${w.irr?`<div class="irr-line">${w.irr}</div>`:''}
+        ${w.note?`<div class="note-line">${w.note}</div>`:''}
+        <div class="ex-box"><div class="ex-kr">${w.ex} ${spkBtn(w.ex)}</div><div class="ex-ja">${w.exja}</div>${w.exen?`<div class="ex-en">${w.exen}</div>`:''}</div>
+        ${w.ex2?`<div class="ex-box" style="margin-top:8px;"><div class="ex-kr">${w.ex2} ${spkBtn(w.ex2)}</div><div class="ex-ja">${w.exja2}</div>${w.ex2en?`<div class="ex-en">${w.ex2en}</div>`:''}</div>`:''}
+      </div>
+      <button class="modal-close" style="background:var(--ink2)" onclick="closeModal();listWeek=${w.week};nav('wordList')">UNIT${w.week}の単語一覧で見る</button>
+      <button class="modal-close" style="margin-top:8px" onclick="closeModal()">閉じる</button>
+      </div></div>`;
+}
+
+/* ============ 学習記録・目標 ============ */
+/* store.study.days['YYYY-MM-DD'] = その日にフラッシュカードを裏返した単語No（同じ単語は1日1回）
+   store.goals = [{id,from,to,laps,pn,pu,start,end,created}] */
+const PU_LABEL={day:'日間',week:'週間',month:'か月'};
+const PN_MAX={day:730,week:104,month:24};
+function goalEnd(start,pn,pu){
+  if(pu==='day') return addDays(start,pn-1);
+  if(pu==='week') return addDays(start,pn*7-1);
+  return addDays(addMonths(start,pn),-1);
+}
+function rangeCount(from,to){ return WORDS.filter(w=>w.week>=from && w.week<=to).length; }
+function dayCountInRange(k,from,to){
+  const a=store.study.days[k]||[]; let c=0;
+  for(let i=0;i<a.length;i++){ const u=WMAP[a[i]]; if(u>=from && u<=to) c++; }
+  return c;
+}
+function goalLabel(g){ return (g.from===g.to?'UNIT'+g.from:'UNIT'+g.from+'〜UNIT'+g.to)+' ・ '+g.pn+PU_LABEL[g.pu]+' ・ '+g.laps+'周'; }
+
+/* 1つの目標の進捗を、開始日から今日まで1日ずつ再現する。
+   その日の目標 = 残り単語数 ÷ 残り日数（切り上げ）。休んだ分は自動で翌日以降に上乗せされる。 */
+function simGoal(g,today){
+  const size=rangeCount(g.from,g.to), total=size*g.laps;
+  const r={g,size,total,days:[],byDate:{},done:0,pct:0,completed:false,completedOn:null,status:'active',todayTarget:0,todayCount:0,daysLeft:0};
+  if(g.start>today){ r.status='upcoming'; r.daysLeft=dayNum(g.end)-dayNum(g.start)+1; return r; }
+  const last=g.end<today?g.end:today;
+  let cum=0;
+  for(let k=g.start;k<=last;k=addDays(k,1)){
+    if(cum>=total) break;
+    const left=dayNum(g.end)-dayNum(k)+1;
+    const target=Math.min(size,Math.ceil((total-cum)/left));
+    const raw=dayCountInRange(k,g.from,g.to);
+    const eff=Math.min(raw,total-cum);
+    cum+=eff;
+    const e={date:k,count:raw,eff,target,achieved:eff>=target,cumAfter:cum};
+    r.days.push(e); r.byDate[k]=e;
+    if(cum>=total){ r.completed=true; r.completedOn=k; }
+  }
+  r.done=cum;
+  r.pct=total?Math.min(100,Math.floor(cum/total*100)):0;
+  if(r.completed) r.status='completed';
+  else if(today>g.end) r.status='expired';
+  else {
+    const e=r.byDate[today];
+    if(e){ r.todayTarget=e.target; r.todayCount=e.count; }
+    r.daysLeft=dayNum(g.end)-dayNum(today)+1;
+  }
+  return r;
+}
+function dayInfo(k,sims){
+  const items=[];
+  sims.forEach(s=>{ const e=s.byDate[k]; if(e) items.push({g:s.g,e}); });
+  return {items, active:items.length>0, achieved:items.length>0 && items.every(i=>i.e.achieved)};
+}
+function streakCalc(set,today){
+  let cur=0, k=set.has(today)?today:addDays(today,-1);
+  while(set.has(k)){ cur++; k=addDays(k,-1); }
+  const arr=[...set].sort(); let max=0,run=0,prev=null;
+  arr.forEach(x=>{ run=(prev && addDays(prev,1)===x)?run+1:1; if(run>max) max=run; prev=x; });
+  return {cur,max};
+}
+/* 勉強した日 = その日に2枚以上裏返した日 / 目標到達日 = その日有効な目標がすべて当日目標に到達した日 */
+function computeStats(){
+  const today=todayKey();
+  const sims=store.goals.map(g=>simGoal(g,today));
+  const days=store.study.days;
+  const studySet=new Set(Object.keys(days).filter(k=>days[k].length>=2));
+  const achSet=new Set(), keys=new Set();
+  sims.forEach(s=>Object.keys(s.byDate).forEach(k=>keys.add(k)));
+  keys.forEach(k=>{ if(dayInfo(k,sims).achieved) achSet.add(k); });
+  const a=streakCalc(studySet,today), b=streakCalc(achSet,today);
+  return {today,sims,studySet,achSet,total:studySet.size,studyCur:a.cur,studyMax:a.max,achTotal:achSet.size,achCur:b.cur,achMax:b.max};
+}
+function todaySnapshot(){
+  const st=computeStats(), k=st.today;
+  return {studied:(store.study.days[k]||[]).length>=2, allAch:dayInfo(k,st.sims).achieved,
+          completed:st.sims.filter(s=>s.completed).length, streak:st.studyCur};
+}
+/* フラッシュカードを表→裏に裏返したときに呼ばれる */
+function recordFlip(no){
+  const k=todayKey(), days=store.study.days;
+  const arr=days[k]||(days[k]=[]);
+  if(arr.includes(no)) return;
+  const b=todaySnapshot();
+  arr.push(no); saveStore();
+  const a=todaySnapshot();
+  if(a.completed>b.completed){ showToast('🏆 目標を達成しました！おめでとう！',3600); fxFire(); }
+  else if(a.allAch && !b.allAch){ showToast('🎯 今日の目標を達成！',3200); fxConfetti(); }
+  else if(a.studied && !b.studied){ showToast('🔥 今日の学習を達成！ 連続'+a.streak+'日',2800); }
+}
+
+function ringSvg(pct,size){
+  const r=size/2-8, c=2*Math.PI*r, off=c*(1-pct/100), m=size/2;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="flex-shrink:0">
+    <circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="var(--line)" stroke-width="9"/>
+    <circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="${pct>=100?'var(--ok)':'var(--ink2)'}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 ${m} ${m})"/>
+    <text x="${m}" y="${m}" text-anchor="middle" dominant-baseline="central" font-size="${size*0.22}" font-weight="700" fill="var(--ink)">${pct}%</text></svg>`;
+}
+
+function homeSummaryHtml(){
+  const st=computeStats(), k=st.today;
+  const n=(store.study.days[k]||[]).length;
+  const act=st.sims.filter(s=>s.status==='active' && s.byDate[k]);
+  const nAch=act.filter(s=>s.byDate[k].achieved).length;
+  const goalTxt=act.length?`${nAch}/${act.length}`:'―';
+  return `<div class="home-sum" onclick="nav('goalHome')">
+    <div><b>🔥 ${st.studyCur}日</b><span>連続勉強日数</span></div>
+    <div><b>${n}語</b><span>今日めくった数</span></div>
+    <div><b>${goalTxt}</b><span>${act.length?'今日の目標 達成':'目標未設定'}</span></div></div>`;
+}
+
+/* ---------- 目標・記録 画面 ---------- */
+function renderGoalHome(){
+  titleEl.textContent='目標・記録';
+  const st=computeStats(), k=st.today;
+  const nToday=(store.study.days[k]||[]).length;
+  const tiles=[
+    ['合計勉強日数',st.total,''],['連続日数',st.studyCur,''],['最大連続日数',st.studyMax,''],
+    ['合計目標到達日数',st.achTotal,'g'],['連続目標到達日数',st.achCur,'g'],['最大連続目標到達日数',st.achMax,'g']
+  ].map(t=>`<div class="gtile ${t[2]}"><b>${t[1]}<small>日</small></b><span>${t[0]}</span></div>`).join('');
+  const todayMsg = nToday>=2 ? `今日は${nToday}語めくりました。勉強日にカウント済みです ✅`
+                  : `今日は${nToday}語。あと${2-nToday}語めくると「勉強した日」になります。`;
+
+  const cur=st.sims.filter(s=>s.status==='active'||s.status==='upcoming');
+  const past=st.sims.filter(s=>s.status==='completed'||s.status==='expired');
+  const card=s=>{
+    const g=s.g, per=g.start+' 〜 '+g.end;
+    let badge='', info='';
+    if(s.status==='completed') badge='<span class="gbadge ok">🏆 達成</span>';
+    else if(s.status==='expired') badge='<span class="gbadge ng">期間終了</span>';
+    else if(s.status==='upcoming') badge='<span class="gbadge up">開始前</span>';
+    if(s.status==='active'){
+      const tp=s.todayTarget?Math.min(100,Math.floor(s.todayCount/s.todayTarget*100)):0;
+      const tAch=s.todayCount>=s.todayTarget;
+      info=`<b>${s.done}</b> / ${s.total}語　残り<b>${s.total-s.done}</b>語・<b>${s.daysLeft}</b>日<br>
+        今日の目標 <b>${s.todayTarget}</b>語（今日 <b>${s.todayCount}</b>語）${tAch?' ✅':''}
+        <div class="gbar"><i class="${tAch?'ok':''}" style="width:${tp}%"></i></div>`;
+    } else if(s.status==='upcoming'){
+      info=`${fmtDate(g.start)}から開始<br>全${s.total}語（1日あたり約${Math.ceil(s.total/s.daysLeft)}語）`;
+    } else if(s.status==='completed'){
+      info=`<b>${s.total}</b>語をやりきりました！<br>${fmtDate(s.completedOn)}に達成`;
+    } else {
+      info=`<b>${s.done}</b> / ${s.total}語まで進みました（${s.pct}%）`;
+    }
+    return `<div class="goal-card">
+      <div class="gh"><div><div class="gt">${goalLabel(g)}${badge}</div><div class="gs">${per}　対象 ${s.size}語 ×${g.laps}周＝${s.total}語</div></div>
+        <button class="gx" onclick="deleteGoal('${g.id}')">削除</button></div>
+      <div class="gb">${ringSvg(s.pct,86)}<div class="gi">${info}</div></div></div>`;
+  };
+
+  // 直近14日グラフ
+  const days=store.study.days; const cols=[]; let mx=1;
+  for(let i=13;i>=0;i--){ const d=addDays(k,-i); const c=(days[d]||[]).length; if(c>mx) mx=c; cols.push([d,c]); }
+  const chart=`<div class="chart14">${cols.map(([d,c])=>{
+    const cls=st.achSet.has(d)?'a':(c>=2?'s':'');
+    return `<div class="col"><div class="v">${c||''}</div><div class="bar ${cls}" style="height:${Math.round(c/mx*70)}%"></div><div class="l">${parseKey(d).getDate()}</div></div>`;
+  }).join('')}</div>
+  <div class="cal-leg"><span><i style="background:var(--ok)"></i>目標到達日</span><span><i style="background:var(--ink2)"></i>勉強した日</span><span><i style="background:#c9c2b3"></i>1枚以下</span></div>`;
+
+  main.innerHTML=`
+    <div class="setup-block"><h3>学習の記録</h3><div class="gtiles">${tiles}</div>
+      <div class="subnote">${todayMsg}<br>「勉強した日」＝その日にフラッシュカードを2枚以上裏返した日。<br>「目標到達日」＝その日有効な目標すべてで、当日の目標数に届いた日。</div></div>
+    <div class="setup-block"><h3>目標（${cur.length}件）</h3>
+      ${cur.map(card).join('') || '<div class="subnote">進行中の目標はありません。下のボタンから設定しましょう。</div>'}
+      <button class="startbtn" onclick="openGoalNew()">＋ 目標を追加</button></div>
+    <div class="setup-block"><h3>直近14日の学習単語数</h3>${chart}</div>
+    <button class="startbtn" style="background:var(--ink2)" onclick="openCalendar()">📅 カレンダーを見る</button>
+    ${past.length?`<div class="setup-block" style="margin-top:22px"><h3>過去の目標</h3>${past.map(card).join('')}</div>`:''}`;
+}
+function deleteGoal(id){
+  const g=store.goals.find(x=>x.id===id); if(!g) return;
+  if(!confirm('この目標を削除しますか？\n'+goalLabel(g)+'\n（学習記録は残りますが、この目標の到達記録は消えます）')) return;
+  store.goals=store.goals.filter(x=>x.id!==id); saveStore(); renderGoalHome();
+}
+
+/* ---------- 目標の追加 ---------- */
+let goalCfg={from:1,to:1,pn:1,pu:'week',laps:1,start:todayKey()};
+function openGoalNew(){ goalCfg={from:1,to:1,pn:1,pu:'week',laps:1,start:todayKey()}; nav('goalNew'); }
+function setGoalNum(key,v){
+  let n=Math.floor(+v); if(!(n>=1)) n=1;
+  n=Math.min(n,key==='pn'?PN_MAX[goalCfg.pu]:30);
+  goalCfg[key]=n; renderGoalNew();
+}
+function setGoalStart(v){
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v)){
+    const min=addDays(todayKey(),-365);
+    goalCfg.start=v<min?min:v;
+  }
+  renderGoalNew();
+}
+function goalPreview(){
+  const c=goalCfg, size=rangeCount(c.from,c.to), total=size*c.laps;
+  const end=goalEnd(c.start,c.pn,c.pu), days=dayNum(end)-dayNum(c.start)+1;
+  const per=Math.ceil(total/days);
+  const valid=days>=c.laps;
+  return {size,total,end,days,per,valid};
+}
+function renderGoalNew(){
+  titleEl.textContent='目標を追加';
+  const U=Array.from({length:WEEKS_TOTAL},(_,i)=>i+1);
+  const fromC=U.map(u=>`<div class="chip ${goalCfg.from===u?'active':''}" onclick="goalCfg.from=${u};if(goalCfg.to<${u})goalCfg.to=${u};renderGoalNew()">UNIT${u}</div>`).join('');
+  const toC=U.map(u=>{ const dis=u<goalCfg.from; return `<div class="chip ${goalCfg.to===u?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="goalCfg.to=${u};renderGoalNew()"`}>UNIT${u}</div>`; }).join('');
+  const puC=['day','week','month'].map(p=>`<div class="chip ${goalCfg.pu===p?'active':''}" onclick="goalCfg.pu='${p}';goalCfg.pn=Math.min(goalCfg.pn,PN_MAX['${p}']);renderGoalNew()">${PU_LABEL[p]}</div>`).join('');
+  const pv=goalPreview();
+  main.innerHTML=`
+    <div class="setup-block"><h3>範囲（どこからどこまで）</h3>
+      <div class="tabrow">${fromC}</div>
+      <div style="text-align:center;font-size:12px;color:var(--sub);margin:4px 0;">〜</div>
+      <div class="tabrow">${toC}</div></div>
+    <div class="setup-block"><h3>期間（いつまでに）</h3>
+      <div class="row-inline"><input class="num-in" type="number" inputmode="numeric" min="1" max="${PN_MAX[goalCfg.pu]}" value="${goalCfg.pn}" onchange="setGoalNum('pn',this.value)">
+        <div class="tabs">${puC}</div></div>
+      <div class="row-inline" style="margin-top:10px"><span style="font-size:12.5px;color:var(--sub)">開始日</span>
+        <input class="date-in" type="date" value="${goalCfg.start}" onchange="setGoalStart(this.value)"></div></div>
+    <div class="setup-block"><h3>周回数</h3>
+      <div class="row-inline"><input class="num-in" type="number" inputmode="numeric" min="1" max="30" value="${goalCfg.laps}" onchange="setGoalNum('laps',this.value)"><span style="font-size:14px">周</span></div></div>
+    <div class="setup-block"><h3>この目標の内容</h3>
+      <div class="prev-box">
+        ${goalCfg.from===goalCfg.to?'UNIT'+goalCfg.from:'UNIT'+goalCfg.from+'〜UNIT'+goalCfg.to}（<b>${pv.size}</b>語）を <b>${goalCfg.laps}</b>周 ＝ <b>${pv.total}</b>語<br>
+        期間：${fmtDate(goalCfg.start)} 〜 ${fmtDate(pv.end)}（${pv.days}日間）<br>
+        ${pv.valid?`1日あたり目安：約<b>${pv.per}</b>語`:`<span class="err">期間が短すぎます。同じ単語は1日1回までなので、周回数（${goalCfg.laps}周）以上の日数が必要です。</span>`}
+      </div>
+      <div class="subnote">・数えるのは、範囲内の単語をフラッシュカードで裏返した数です（同じ単語は1日1回まで）。別の日にもう一度めくると次の周としてカウントされます。<br>
+      ・1日の目標は毎日「残りの単語数 ÷ 残りの日数」で再計算されます。休んだ分は翌日以降に自動で上乗せされます。<br>
+      ・目標は複数同時に設定できます。</div></div>
+    <button class="startbtn" ${pv.valid?'':'disabled'} onclick="saveGoal()">この目標で始める</button>`;
+}
+function saveGoal(){
+  const c=goalCfg, pv=goalPreview();
+  if(!pv.valid) return;
+  store.goals.push({id:Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36),from:c.from,to:c.to,laps:c.laps,pn:c.pn,pu:c.pu,start:c.start,end:pv.end,created:Date.now()});
+  saveStore();
+  showToast('🎯 目標を追加しました');
+  goBack();
+}
+
+/* ---------- カレンダー ---------- */
+let calY=new Date().getFullYear(), calM=new Date().getMonth(), calSel=null;
+function openCalendar(){ const d=new Date(); calY=d.getFullYear(); calM=d.getMonth(); calSel=todayKey(); nav('calendar'); }
+function calMove(n){ calM+=n; if(calM<0){ calM=11; calY--; } if(calM>11){ calM=0; calY++; } calSel=null; renderCalendar(); }
+function calPick(k){ calSel=(calSel===k)?null:k; renderCalendar(); }
+function renderCalendar(){
+  titleEl.textContent='カレンダー';
+  const st=computeStats(), today=st.today, days=store.study.days;
+  const first=new Date(calY,calM,1), nDays=new Date(calY,calM+1,0).getDate();
+  let cells='', mStudy=0, mAch=0, mWords=0;
+  for(let i=0;i<first.getDay();i++) cells+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=nDays;d++){
+    const k=calY+'-'+pad2(calM+1)+'-'+pad2(d);
+    const cnt=(days[k]||[]).length, info=dayInfo(k,st.sims);
+    let cls='';
+    if(info.achieved) cls='ach';
+    else if(info.active && k<today) cls='miss';
+    else if(cnt>=2) cls='st';
+    if(k>today) cls+=' fut';
+    if(k===today) cls+=' today';
+    if(k===calSel) cls+=' sel';
+    if(cnt>=2) mStudy++; if(info.achieved) mAch++; mWords+=cnt;
+    cells+=`<div class="cal-cell ${cls}" onclick="calPick('${k}')"><span class="cd">${d}</span>${cnt?`<span class="cn">${cnt}</span>`:''}${info.achieved?'<span class="cm">✓</span>':''}</div>`;
+  }
+  let det='';
+  if(calSel){
+    const nos=days[calSel]||[], info=dayInfo(calSel,st.sims);
+    const rows=info.items.map(i=>`<div>${i.e.achieved?'✅':(calSel<today?'❌':'⏳')} ${goalLabel(i.g)}：目標 <b>${i.e.target}</b>語 ／ 実績 <b>${i.e.count}</b>語</div>`).join('');
+    det=`<div class="cal-det"><h4>${fmtDate(calSel)}</h4>
+      学習した単語：<b>${nos.length}</b>語　${nos.length>=2?'（勉強した日 ✅）':'（勉強日の条件は2枚以上）'}
+      ${rows?`<div style="margin-top:6px">${rows}</div>`:'<div style="margin-top:6px;color:var(--sub)">この日に有効な目標はありません。</div>'}
+      ${nos.length?`<div class="cal-words">${nos.map(n=>WBY[n]).filter(Boolean).map(w=>`<span>${w.kr} <small>${w.ja}</small></span>`).join('')}</div>`:''}</div>`;
+  }
+  main.innerHTML=`
+    <div class="cal-head"><button onclick="calMove(-1)">‹</button><b>${calY}年 ${calM+1}月</b><button onclick="calMove(1)">›</button></div>
+    <div class="cal-grid">${DOW.map(x=>`<div class="cal-dow">${x}</div>`).join('')}${cells}</div>
+    <div class="cal-leg"><span><i style="background:var(--ok-bg);border-color:var(--ok)"></i>目標到達</span><span><i style="background:#e8eef7"></i>勉強した日</span><span><i style="background:#fbe9e6"></i>目標未達</span><span>数字＝その日にめくった単語数</span></div>
+    ${det}
+    <div class="subnote" style="margin-top:14px">${calM+1}月：勉強した日 <b>${mStudy}</b>日 ／ 目標到達 <b>${mAch}</b>日 ／ 合計 <b>${mWords}</b>語</div>`;
 }
 
 /* ============ 初期化 ============ */
