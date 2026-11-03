@@ -264,6 +264,10 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .gdir span.t{font-size:12px;color:var(--sub);}
 .glinks{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;}
 .glinks span{text-decoration:underline;cursor:pointer;color:var(--ink);}
+.set-unit{border:1px solid var(--line);border-radius:12px;margin:8px 0;background:var(--card);}
+.set-unit summary{padding:11px 12px;font-weight:700;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--ink);}
+.set-unit summary .cnt{font-size:12px;font-weight:400;color:var(--sub);}
+.set-unit .modal-row{padding-left:12px;padding-right:12px;}
 .gtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
 .gtile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;box-shadow:var(--shadow);}
 .gtile b{display:block;font-size:22px;color:var(--ink);line-height:1.2;}
@@ -1627,8 +1631,7 @@ function renderFcSetup(){
 function buildFcDeck(){
   if(fcCfg.src==='goal'){
     const g=store.goalSet[fcCfg.slot]; if(!g) return [];
-    const s=simGoal(g,todayKey());
-    return WORDS.filter(w=>w.week>=g.from && w.week<=g.to && !s.lapKeys.has(dirKey(w.no,fcCfg.dir)));
+    return WORDS.filter(w=>w.week>=g.from && w.week<=g.to && !isMastered(w.no,fcCfg.dir)).sort((a,b)=>a.no-b.no);
   }
   if(fcCfg.src==='day'){ let dp=(store.study.days[fcCfg.date]||[]).map(n=>WBY[n]).filter(Boolean); if(fcCfg.order==='rand') dp=shuffleArr(dp.slice()); return dp; }
   let pool = WORDS.filter(w=>w.week===fcCfg.week);
@@ -1640,10 +1643,19 @@ function buildFcDeck(){
 }
 function shuffleArr(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
-let fcDeck=[], fcIdx=0, fcFlipped=false;
+let fcDeck=[], fcIdx=0, fcFlipped=false, fcRemoved={};
+/* 目標のカード一覧で、現在の周でまだ数えていない最初のカード（番号が最小）の位置 */
+function goalStartIdx(){
+  const g=store.goalSet[fcCfg.slot]; if(!g) return 0;
+  const s=simGoal(g,todayKey());
+  const i=fcDeck.findIndex(w=>!s.lapKeys.has(dirKey(w.no,fcCfg.dir)));
+  return i<0?0:i;
+}
 function startFc(){
   fcDeck = buildFcDeck();
-  fcIdx=0; fcFlipped=false;
+  fcRemoved={};
+  fcIdx = fcCfg.src==='goal' ? goalStartIdx() : 0;
+  fcFlipped=false;
   saveSession();
   nav('fcView');
 }
@@ -1784,6 +1796,8 @@ function fcMark(type){
   const w=fcDeck[fcIdx];
   const d=fcCfg.dir;
   if(type==='mastered'){
+    fcRemoved[dirKey(w.no,d)]=fcIdx;
+    recordFlip(w.no,d);   // 「覚えた」も学習したものとして数える（方向別）
     if(!isMastered(w.no)) store.mastered[d].push(w.no);
     store.review[d] = store.review[d].filter(n=>n!==w.no);
     saveStore();
@@ -1814,14 +1828,20 @@ function attachSwipe(el){
 }
 
 /* ============ セット管理モーダル ============ */
+let setOpenUnits=new Set();
+function toggleSetUnit(u,open){ if(open) setOpenUnits.add(u); else setOpenUnits.delete(u); }
 function openSetModal(type){
   const list = (type==='mastered'?store.mastered:store.review)[fcCfg.dir];
   const title = (type==='mastered'?'覚えたセット':'復習セット')+'【'+dirLabel(fcCfg.dir)+'】';
-  const rows = list.map(no=>{
-    const w = WORDS.find(x=>x.no===no);
-    if(!w) return '';
-    return `<div class="modal-row"><span>${w.kr} <span style="color:var(--sub)">${w.ja}</span></span>
-      <button onclick="restoreWord(${no},'${type}')">もとに戻す</button></div>`;
+  const by={};
+  list.forEach(no=>{ const w=WBY[no]; if(w) (by[w.week]||(by[w.week]=[])).push(w); });
+  const rows = Object.keys(by).map(Number).sort((x,y)=>x-y).map(u=>{
+    const ws=by[u].sort((x,y)=>x.no-y.no);
+    return `<details class="set-unit" ${setOpenUnits.has(u)?'open':''} ontoggle="toggleSetUnit(${u},this.open)">
+      <summary>UNIT${u}<span class="cnt">${ws.length}語</span></summary>
+      ${ws.map(w=>`<div class="modal-row"><span>${w.kr} <span style="color:var(--sub)">${w.ja}</span></span>
+        <button onclick="restoreWord(${w.no},'${type}')">もとに戻す</button></div>`).join('')}
+    </details>`;
   }).join('') || `<div class="empty-note">まだありません。</div>`;
   document.getElementById('modalRoot').innerHTML = `
     <div class="modal-bg" onclick="if(event.target===this)closeModal()">
@@ -1838,7 +1858,24 @@ function restoreWord(no,type){
   else store.review[d] = store.review[d].filter(n=>n!==no);
   saveStore();
   openSetModal(type);
-  if(screen==='fcView'){ fcDeck = buildFcDeck(); if(fcIdx>=fcDeck.length) fcIdx=Math.max(0,fcDeck.length-1); saveSession(); }
+  if(screen==='fcView'){
+    // 見ているカードは動かさず、戻したカードを元の位置に入れる
+    const cur=fcDeck[fcIdx], w=WBY[no];
+    const nd=buildFcDeck();
+    if(w && nd.some(x=>x.no===no) && !fcDeck.some(x=>x.no===no)){
+      if(fcCfg.order==='rand'){
+        const pos=fcRemoved[dirKey(no,d)];
+        fcDeck.splice(Math.min(pos==null?fcIdx:pos,fcDeck.length),0,w);
+      } else {
+        const keep=new Set(nd.map(x=>x.no).concat(fcDeck.map(x=>x.no)));
+        fcDeck=nd.filter(x=>keep.has(x.no));
+      }
+    }
+    const ci=cur?fcDeck.findIndex(x=>x.no===cur.no):-1;
+    if(ci>=0) fcIdx=ci;
+    else if(fcIdx>=fcDeck.length){ const wi=fcDeck.findIndex(x=>x.no===no); fcIdx=wi>=0?wi:Math.max(0,fcDeck.length-1); }
+    saveSession();
+  }
 }
 function closeModal(){ document.getElementById('modalRoot').innerHTML=''; if(screen==='fcSetup') renderFcSetup(); if(screen==='fcView') renderFcView(true); }
 
@@ -2475,6 +2512,8 @@ function showToast(msg,ms){
 /* ============ 単語検索 ============ */
 const WBY={}, WMAP={};
 WORDS.forEach(w=>{ WBY[w.no]=w; WMAP[w.no]=w.week; });
+/* 旧版で作った目標：その時点で覚えていたカードを基準として固定する（1回だけ） */
+(function(){ let ch=false; ['short','long'].forEach(s=>{ const g=store.goalSet[s]; if(g && !g.base){ const inR=no=>{ const u=WMAP[no]; return u>=g.from && u<=g.to; }; g.base={kr2ja:store.mastered.kr2ja.filter(inR),ja2kr:store.mastered.ja2kr.filter(inR)}; ch=true; } }); if(ch){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(store)); }catch(e){} } })();
 function kataToHira(s){ return s.replace(/[\u30a1-\u30f6]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
 function normQ(s){ return kataToHira(String(s||'').normalize('NFC').toLowerCase()).replace(/[\s\u3000]+/g,''); }
 let SIDX=null;
@@ -2569,20 +2608,29 @@ function simGoal(g,today){
   const r={g,words,size,total,totalDays,days:[],byDate:{},done:0,pct:0,completed:false,completedOn:null,status:'active',
            todayTarget:0,todayCount:0,daysLeft:0,lap:1,lapDone:0,lapKeys:new Set(),planned:0,diff:0};
   if(g.start>today){ r.status='upcoming'; r.daysLeft=totalDays; return r; }
+  const dir0=g.base||{kr2ja:[],ja2kr:[]};
+  const inRange=no=>{ const u=WMAP[no]; return u>=g.from && u<=g.to; };
   let cum=0, lap=1; const lapSet=new Set();
+  // 「覚えた」カードは学習したものとして数える（方向別）。目標設定時に覚えていたカードは1周目から数え済み。
+  ['kr2ja','ja2kr'].forEach(d=>(dir0[d]||[]).forEach(no=>{ if(inRange(no)){ const key=dirKey(no,d); if(!lapSet.has(key)){ lapSet.add(key); cum++; } } }));
+  const rollIn=()=>{ // 2周目以降：いま「覚えた」にあるカードは自動で数え済みにする
+    ['kr2ja','ja2kr'].forEach(d=>store.mastered[d].forEach(no=>{ if(inRange(no) && cum<total){ const key=dirKey(no,d); if(!lapSet.has(key)){ lapSet.add(key); cum++; } } }));
+  };
+  const rollCheck=()=>{ while(lapSet.size>=size && cum<total){ lapSet.clear(); lap++; rollIn(); } if(cum>=total) return; };
   for(let k=g.start;k<=today;k=addDays(k,1)){
     if(cum>=total) break;
     const left=Math.max(1,dayNum(g.end)-dayNum(k)+1);
     const target=Math.min(size,Math.ceil((total-cum)/left));
     const list=(store.study.dirs[k]||[]).filter(key=>{ const u=WMAP[parseInt(key,10)]; return u>=g.from && u<=g.to; });
     const used=new Set(); let dayNew=0, progress=true;
+    rollCheck();
     while(progress && cum<total){
       progress=false;
       for(let i=0;i<list.length && cum<total;i++){
         const key=list[i];
         if(used.has(key) || lapSet.has(key)) continue;
         lapSet.add(key); used.add(key); cum++; dayNew++; progress=true;
-        if(lapSet.size>=size){ lapSet.clear(); lap++; }
+        rollCheck();
       }
     }
     const e={date:k,count:dayNew,target,achieved:dayNew>=target,cumAfter:cum};
@@ -2698,8 +2746,8 @@ function homeGoalHtml(){
     else if(s.status==='active') note=s.diff>0?`計画より${s.diff}問 先行`:(s.diff<0?`計画より${-s.diff}問 遅れ`:'計画どおり');
     allBlk=`<div class="grow"><span class="l">${SLOT_LABEL[slot]}（全体）</span><span class="r"><b>${ap}%</b>${s.done}/${s.total}問</span></div>${barHtml(ap,plan)}<div class="gnote">${note}</div>`;
     body=`${range}${todayBlk}${allBlk}
-      <button class="startbtn" style="margin-top:14px" ${s.status==='completed'?'disabled':''} onclick="startGoalFc()">▶ 前回の続きから始める</button>
-      <div class="gdir"><span class="t">出題の方向</span>${['kr2ja','ja2kr'].map(d=>`<div class="chip ${store.goalDir===d?'active':''}" onclick="setGoalDir('${d}')">${d==='kr2ja'?'韓国語→日本語':'日本語→韓国語'}</div>`).join('')}</div>`;
+      <button class="startbtn" style="margin-top:14px" ${s.status==='completed'?'disabled':''} onclick="startGoalFc()">▶ 今日の学習を始める</button>
+      <div class="gdir">${['kr2ja','ja2kr'].map(d=>`<div class="chip ${store.goalDir===d?'active':''}" onclick="setGoalDir('${d}')">${d==='kr2ja'?'韓国語→日本語':'日本語→韓国語'}</div>`).join('')}</div>`;
   }
   const links=`<div class="glinks"><span onclick="nav('goalHome')">🎯 目標の設定・記録</span><span onclick="openCalendar()">📅 カレンダー</span></div>
     <div class="glinks" style="margin-top:8px"><span onclick="openDayCards()">🌙 今日の振り返り（${todayCardsCount()}枚）</span></div>`;
@@ -2814,6 +2862,7 @@ function renderGoalNew(){
       <div class="subnote">・1問＝「単語×方向×周」です。両方向がそれぞれ1問として数えられます。<br>
       ・進むのは、範囲内の「その周でまだ数えていない問題」をフラッシュカードで裏返したときだけです。<br>
       ・今日のノルマは毎日「残りの問題数 ÷ 残りの日数」で計算し直されます。休んだ分は翌日以降に自動で上乗せされます。<br>
+      ・「覚えた」にしたカードは、学習したものとして数えます（方向別）。<br>
       ・設定し直すと、今日から数え直します。</div></div>
     <button class="startbtn" ${pv.valid?'':'disabled'} onclick="saveGoal()">この目標で始める</button>`;
 }
@@ -2821,7 +2870,9 @@ function saveGoal(){
   const c=goalCfg, pv=goalPreview();
   if(!pv.valid) return;
   if(store.goalSet[c.slot] && !confirm(SLOT_LABEL[c.slot]+'を上書きします。進捗は今日から数え直しになります。よろしいですか？')) return;
-  store.goalSet[c.slot]={slot:c.slot,from:c.from,to:c.to,laps:c.laps,start:pv.start,end:c.end,created:Date.now()};
+  const inR=no=>{ const u=WMAP[no]; return u>=c.from && u<=c.to; };
+  store.goalSet[c.slot]={slot:c.slot,from:c.from,to:c.to,laps:c.laps,start:pv.start,end:c.end,created:Date.now(),
+    base:{kr2ja:store.mastered.kr2ja.filter(inR),ja2kr:store.mastered.ja2kr.filter(inR)}};
   store.goalView=c.slot;
   saveStore();
   showToast('🎯 '+SLOT_LABEL[c.slot]+'を設定しました');
