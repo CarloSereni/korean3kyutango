@@ -257,7 +257,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .grow .r{font-size:12px;color:var(--sub);}
 .grow .r b{font-size:20px;color:var(--ok);margin-right:6px;}
 .pbar{position:relative;height:14px;background:var(--line);border-radius:999px;margin:6px 0 4px;border:1px solid var(--line2);}
-.pbar i{display:block;height:100%;background:var(--ok);border-radius:999px;max-width:100%;}
+.pbar i{display:block;height:100%;background:var(--ok);border-radius:999px 0 0 999px;max-width:100%;}
 .pbar u{position:absolute;top:-4px;width:3px;height:20px;background:var(--ink);border-radius:2px;text-decoration:none;}
 .gnote{font-size:11.5px;color:var(--sub);}
 .gdir{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
@@ -283,7 +283,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .goal-card .gi{flex:1;font-size:12.5px;color:var(--ink2);line-height:1.7;}
 .goal-card .gi b{color:var(--ink);}
 .gbar{height:9px;background:var(--line);border-radius:5px;overflow:hidden;margin:4px 0 2px;}
-.gbar i{display:block;height:100%;background:var(--ink2);border-radius:5px;}
+.gbar i{display:block;height:100%;background:var(--ink2);border-radius:5px 0 0 5px;}
 .gbar i.ok{background:var(--ok);}
 .gbadge{display:inline-block;font-size:10.5px;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle;}
 .gbadge.ok{background:var(--ok-bg);color:var(--ok);}
@@ -2715,7 +2715,7 @@ function startGoalFc(){
   startFc();
 }
 function barHtml(pct,planPct){
-  return `<div class="pbar"><i style="width:${pct}%"></i>${planPct!=null?`<u style="left:calc(${planPct}% - 1px)"></u>`:''}</div>`;
+  return `<div class="pbar"><i style="width:${pct}%${pct>=100?';border-radius:999px':''}"></i>${planPct!=null?`<u style="left:calc(${planPct}% - 1px)"></u>`:''}</div>`;
 }
 function homeGoalHtml(){
   const st=computeStats(), k=st.today;
@@ -2750,7 +2750,7 @@ function homeGoalHtml(){
       <div class="gdir">${['kr2ja','ja2kr'].map(d=>`<div class="chip ${store.goalDir===d?'active':''}" onclick="setGoalDir('${d}')">${d==='kr2ja'?'韓国語→日本語':'日本語→韓国語'}</div>`).join('')}</div>`;
   }
   const links=`<div class="glinks"><span onclick="nav('goalHome')">🎯 目標の設定・記録</span><span onclick="openCalendar()">📅 カレンダー</span></div>
-    <div class="glinks" style="margin-top:8px"><span onclick="openDayCards()">🌙 今日の振り返り（${todayCardsCount()}枚）</span></div>`;
+    <div class="glinks" style="margin-top:10px"><span style="font-size:16px;font-weight:700" onclick="openDayCards()">🌙 今日の学習を振り返る（${todayCardsCount()}枚）</span></div>`;
   return `${tiles}<div class="gcard">${tabs}${body}${links}</div>`;
 }
 
