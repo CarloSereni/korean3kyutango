@@ -246,6 +246,24 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .home-sum div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center;box-shadow:var(--shadow);}
 .home-sum b{display:block;font-size:19px;color:var(--ink);}
 .home-sum span{font-size:10.5px;color:var(--sub);}
+.home-sum b small{font-size:11px;font-weight:400;color:var(--sub);margin-left:1px;}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin:0 0 14px;box-shadow:var(--shadow);}
+.gtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.gtabs button{padding:12px 6px;border-radius:999px;border:2px solid var(--ink);background:#fff;color:var(--ink);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+.gtabs button.on{background:var(--ok);border-color:var(--ok);color:#fff;}
+.grange{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--ink);line-height:1.7;margin-bottom:10px;}
+.grow{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;}
+.grow .l{font-weight:700;font-size:14px;color:var(--ink);}
+.grow .r{font-size:12px;color:var(--sub);}
+.grow .r b{font-size:20px;color:var(--ok);margin-right:6px;}
+.pbar{position:relative;height:14px;background:var(--line);border-radius:999px;margin:6px 0 4px;border:1px solid var(--line2);}
+.pbar i{display:block;height:100%;background:var(--ok);border-radius:999px;max-width:100%;}
+.pbar u{position:absolute;top:-4px;width:3px;height:20px;background:var(--ink);border-radius:2px;text-decoration:none;}
+.gnote{font-size:11.5px;color:var(--sub);}
+.gdir{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.gdir span.t{font-size:12px;color:var(--sub);}
+.glinks{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;}
+.glinks span{text-decoration:underline;cursor:pointer;color:var(--ink);}
 .gtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
 .gtile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;box-shadow:var(--shadow);}
 .gtile b{display:block;font-size:22px;color:var(--ink);line-height:1.2;}
@@ -1243,8 +1261,17 @@ function normStore(o){
   if(!o.matchBest) o.matchBest = {};
   if(!o.study || typeof o.study!=='object') o.study = {};
   if(!o.study.days || typeof o.study.days!=='object' || Array.isArray(o.study.days)) o.study.days = {};
-  if(!Array.isArray(o.goals)) o.goals = [];
-  o.goals = o.goals.filter(g=>g && typeof g==='object' && /^\d{4}-\d{2}-\d{2}$/.test(g.start||'') && /^\d{4}-\d{2}-\d{2}$/.test(g.end||'') && g.from>=1 && g.to>=g.from && g.laps>=1);
+  const DRE=/^\d{4}-\d{2}-\d{2}$/;
+  if(!o.goalSet || typeof o.goalSet!=='object' || Array.isArray(o.goalSet)) o.goalSet = {};
+  ['short','long'].forEach(s=>{
+    const g=o.goalSet[s];
+    if(g && typeof g==='object' && DRE.test(g.start||'') && DRE.test(g.end||'') && g.from>=1 && g.to>=g.from && g.laps>=1){ g.slot=s; }
+    else o.goalSet[s]=null;
+  });
+  if(o.goalView!=='long') o.goalView='short';
+  if(o.goalDir!=='ja2kr') o.goalDir='kr2ja';
+  if(!o.study.dirs || typeof o.study.dirs!=='object' || Array.isArray(o.study.dirs)) o.study.dirs = {};
+  delete o.goals;
   return o;
 }
 let store;
@@ -1335,16 +1362,11 @@ function render(){
 function renderHome(){
   titleEl.textContent='단어장';
   main.innerHTML = `
-    <div class="hero">
-      <div class="eyebrow">한글 3급 단어</div>
-      <h2>ハングル単語帳</h2>
-      <p>全8UNIT・896語 収録</p>
-    </div>
+    ${homeGoalHtml()}
     <div class="sbar">
       <input id="homeQ" type="search" placeholder="単語を検索（韓国語・日本語）" onkeydown="if(event.key==='Enter')homeSearch()">
       <button onclick="homeSearch()">検索</button>
     </div>
-    ${homeSummaryHtml()}
     <div class="menu-grid">
       <div class="menu-card" onclick="nav('fcSetup')">
         <div class="ico">🗂</div>
@@ -1472,7 +1494,9 @@ function applyImportedStore(obj){
     invSet: obj.invSet || undefined,
     fcAuto: obj.fcAuto,
     study: obj.study,
-    goals: obj.goals
+    goalSet: obj.goalSet,
+    goalView: obj.goalView,
+    goalDir: obj.goalDir
   });
   invSet = store.invSet || {bgm:true,se:true};
   saveStore();
@@ -1601,6 +1625,11 @@ function renderFcSetup(){
 }
 
 function buildFcDeck(){
+  if(fcCfg.src==='goal'){
+    const g=store.goalSet[fcCfg.slot]; if(!g) return [];
+    const s=simGoal(g,todayKey());
+    return WORDS.filter(w=>w.week>=g.from && w.week<=g.to && !s.lapKeys.has(dirKey(w.no,fcCfg.dir)));
+  }
   if(fcCfg.src==='day'){ let dp=(store.study.days[fcCfg.date]||[]).map(n=>WBY[n]).filter(Boolean); if(fcCfg.order==='rand') dp=shuffleArr(dp.slice()); return dp; }
   let pool = WORDS.filter(w=>w.week===fcCfg.week);
   if(fcCfg.pos!=='all') pool = pool.filter(w=>w.pos===fcCfg.pos);
@@ -1636,7 +1665,7 @@ function resumeSession(){
 }
 
 function renderFcView(noAuto){
-  titleEl.textContent = fcCfg.src==='day' ? (dayCardsLabel(fcCfg.date)+'の復習') : 'UNIT'+(fcCfg.week)+' · '+(fcCfg.pos==='all'?'全品詞':POS_LABEL[fcCfg.pos]);
+  titleEl.textContent = fcCfg.src==='goal' ? ((SLOT_LABEL[fcCfg.slot]||'目標')+' ・ '+dirLabel(fcCfg.dir)) : fcCfg.src==='day' ? (dayCardsLabel(fcCfg.date)+'の復習') : 'UNIT'+(fcCfg.week)+' · '+(fcCfg.pos==='all'?'全品詞':POS_LABEL[fcCfg.pos]);
   if(fcDeck.length===0){
     main.innerHTML = `<div class="deckdone"><div class="big">🎉</div>この条件のカードはありません。<br>（すべて覚えたセットに入っているか、条件に合う単語がありません）
     <div style="margin-top:16px;"><button class="startbtn" onclick="nav('fcSetup')">設定に戻る</button></div></div>`;
@@ -1738,7 +1767,7 @@ function cardTap(e){
 function fcFlip(){
   fcFlipped=!fcFlipped;
   document.getElementById('cardOuter').classList.toggle('flipped');
-  if(fcFlipped){ const fw=fcDeck[fcIdx]; if(fw) recordFlip(fw.no); fcAutoSpeak(); } else stopSpeech();
+  if(fcFlipped){ const fw=fcDeck[fcIdx]; if(fw) recordFlip(fw.no, fcCfg.dir); fcAutoSpeak(); } else stopSpeech();
 }
 function fcNav(dir){
   const outer=document.getElementById('cardOuter');
@@ -2519,44 +2548,40 @@ function openWordModal(no){
 }
 
 /* ============ 学習記録・目標 ============ */
-/* store.study.days['YYYY-MM-DD'] = その日にフラッシュカードを裏返した単語No（同じ単語は1日1回）
-   store.goals = [{id,from,to,laps,pn,pu,start,end,created}] */
-const PU_LABEL={day:'日間',week:'週間',month:'か月'};
-const PN_MAX={day:730,week:104,month:24};
-function goalEnd(start,pn,pu){
-  if(pu==='day') return addDays(start,pn-1);
-  if(pu==='week') return addDays(start,pn*7-1);
-  return addDays(addMonths(start,pn),-1);
-}
+/* store.study.days[k] = その日にめくった単語No（1日1回・方向問わず）
+   store.study.dirs[k] = その日にめくった「単語No:方向」（:k=韓国語→日本語 / :j=日本語→韓国語）
+   store.goalSet = {short:{from,to,laps,start,end,created}|null, long:{...}|null}
+   1問 = 単語×方向×周。範囲の単語数×2方向×周回数 が目標の総問題数。 */
+const SLOT_LABEL={short:'短期目標',long:'長期目標'};
+function dirKey(no,dir){ return no+(dir==='ja2kr'?':j':':k'); }
+function studyCnt(k){ return Math.max((store.study.days[k]||[]).length,(store.study.dirs[k]||[]).length); }
 function rangeCount(from,to){ return WORDS.filter(w=>w.week>=from && w.week<=to).length; }
-function dayCountInRange(k,from,to){
-  const a=store.study.days[k]||[]; let c=0;
-  for(let i=0;i<a.length;i++){ const u=WMAP[a[i]]; if(u>=from && u<=to) c++; }
-  return c;
-}
-function goalLabel(g){ return (g.from===g.to?'UNIT'+g.from:'UNIT'+g.from+'〜UNIT'+g.to)+' ・ '+g.pn+PU_LABEL[g.pu]+' ・ '+g.laps+'周'; }
+function rangeLabel(g){ return g.from===g.to?'UNIT'+g.from:'UNIT'+g.from+'〜UNIT'+g.to; }
+function goalLabel(g){ return SLOT_LABEL[g.slot]+' ・ '+rangeLabel(g)+' ・ '+g.laps+'周'; }
 
 /* 1つの目標の進捗を、開始日から今日まで1日ずつ再現する。
-   進むのは「その周でまだ数えていない単語」を勉強したときだけ。範囲の全単語を1回ずつ数え終えると1周完了し、次の周は数え直し。
-   その日の目標 = 残り単語数 ÷ 残り日数（切り上げ）。休んだ分は自動で翌日以降に上乗せされる。 */
+   進むのは「その周でまだ数えていない問題（単語×方向）」を勉強したときだけ。範囲の全問題を1回ずつ数え終えると1周完了し、次の周は数え直し。
+   その日のノルマ = その日の開始時点の残り問題数 ÷ 残り日数（今日を含む・切り上げ）。休んだ分は自動で翌日以降に上乗せされる。
+   期限を過ぎても未達成なら、残り日数1日として「残り全部」がノルマになる。 */
 function simGoal(g,today){
-  const size=rangeCount(g.from,g.to), total=size*g.laps;
-  const r={g,size,total,days:[],byDate:{},done:0,pct:0,completed:false,completedOn:null,status:'active',todayTarget:0,todayCount:0,daysLeft:0,lap:1,lapDone:0};
-  if(g.start>today){ r.status='upcoming'; r.daysLeft=dayNum(g.end)-dayNum(g.start)+1; return r; }
-  const last=g.end<today?g.end:today;
+  const words=rangeCount(g.from,g.to), size=words*2, total=size*g.laps;
+  const totalDays=dayNum(g.end)-dayNum(g.start)+1;
+  const r={g,words,size,total,totalDays,days:[],byDate:{},done:0,pct:0,completed:false,completedOn:null,status:'active',
+           todayTarget:0,todayCount:0,daysLeft:0,lap:1,lapDone:0,lapKeys:new Set(),planned:0,diff:0};
+  if(g.start>today){ r.status='upcoming'; r.daysLeft=totalDays; return r; }
   let cum=0, lap=1; const lapSet=new Set();
-  for(let k=g.start;k<=last;k=addDays(k,1)){
+  for(let k=g.start;k<=today;k=addDays(k,1)){
     if(cum>=total) break;
-    const left=dayNum(g.end)-dayNum(k)+1;
+    const left=Math.max(1,dayNum(g.end)-dayNum(k)+1);
     const target=Math.min(size,Math.ceil((total-cum)/left));
-    const list=(store.study.days[k]||[]).filter(no=>{ const u=WMAP[no]; return u>=g.from && u<=g.to; });
+    const list=(store.study.dirs[k]||[]).filter(key=>{ const u=WMAP[parseInt(key,10)]; return u>=g.from && u<=g.to; });
     const used=new Set(); let dayNew=0, progress=true;
     while(progress && cum<total){
       progress=false;
       for(let i=0;i<list.length && cum<total;i++){
-        const no=list[i];
-        if(used.has(no) || lapSet.has(no)) continue;
-        lapSet.add(no); used.add(no); cum++; dayNew++; progress=true;
+        const key=list[i];
+        if(used.has(key) || lapSet.has(key)) continue;
+        lapSet.add(key); used.add(key); cum++; dayNew++; progress=true;
         if(lapSet.size>=size){ lapSet.clear(); lap++; }
       }
     }
@@ -2565,14 +2590,16 @@ function simGoal(g,today){
     if(cum>=total){ r.completed=true; r.completedOn=k; }
   }
   r.done=cum;
-  r.lap=Math.min(lap,g.laps); r.lapDone=r.completed?size:lapSet.size;
+  r.lap=Math.min(lap,g.laps); r.lapDone=r.completed?size:lapSet.size; r.lapKeys=r.completed?new Set():lapSet;
   r.pct=total?Math.min(100,Math.floor(cum/total*100)):0;
+  const elapsed=Math.max(1,Math.min(totalDays,dayNum(today)-dayNum(g.start)+1));
+  r.planned=Math.ceil(total*elapsed/totalDays); r.diff=cum-r.planned;
   if(r.completed) r.status='completed';
-  else if(today>g.end) r.status='expired';
   else {
+    if(today>g.end) r.status='overdue';
     const e=r.byDate[today];
     if(e){ r.todayTarget=e.target; r.todayCount=e.count; }
-    r.daysLeft=dayNum(g.end)-dayNum(today)+1;
+    r.daysLeft=Math.max(0,dayNum(g.end)-dayNum(today)+1);
   }
   return r;
 }
@@ -2588,12 +2615,12 @@ function streakCalc(set,today){
   arr.forEach(x=>{ run=(prev && addDays(prev,1)===x)?run+1:1; if(run>max) max=run; prev=x; });
   return {cur,max};
 }
-/* 勉強した日 = その日に2枚以上裏返した日 / 目標到達日 = その日有効な目標がすべて当日目標に到達した日 */
+/* 勉強した日 = その日に2枚以上裏返した日 / 目標到達日 = その日有効な目標がすべて当日のノルマに到達した日 */
 function computeStats(){
   const today=todayKey();
-  const sims=store.goals.map(g=>simGoal(g,today));
-  const days=store.study.days;
-  const studySet=new Set(Object.keys(days).filter(k=>days[k].length>=2));
+  const sims=['short','long'].map(s=>store.goalSet[s]).filter(Boolean).map(g=>simGoal(g,today));
+  const allKeys=new Set([...Object.keys(store.study.days),...Object.keys(store.study.dirs)]);
+  const studySet=new Set([...allKeys].filter(k=>studyCnt(k)>=2));
   const achSet=new Set(), keys=new Set();
   sims.forEach(s=>Object.keys(s.byDate).forEach(k=>keys.add(k)));
   keys.forEach(k=>{ if(dayInfo(k,sims).achieved) achSet.add(k); });
@@ -2602,16 +2629,20 @@ function computeStats(){
 }
 function todaySnapshot(){
   const st=computeStats(), k=st.today;
-  return {studied:(store.study.days[k]||[]).length>=2, allAch:dayInfo(k,st.sims).achieved,
+  return {studied:studyCnt(k)>=2, allAch:dayInfo(k,st.sims).achieved,
           completed:st.sims.filter(s=>s.completed).length, streak:st.studyCur};
 }
-/* フラッシュカードを表→裏に裏返したときに呼ばれる */
-function recordFlip(no){
-  const k=todayKey(), days=store.study.days;
-  const arr=days[k]||(days[k]=[]);
-  if(arr.includes(no)) return;
+/* フラッシュカードを表→裏に裏返したときに呼ばれる（同じ単語・同じ方向は1日1回） */
+function recordFlip(no,dir){
+  const k=todayKey(), days=store.study.days, dirs=store.study.dirs;
+  const key=dirKey(no,dir);
+  const da=dirs[k]||(dirs[k]=[]);
+  if(da.includes(key)) return;
   const b=todaySnapshot();
-  arr.push(no); saveStore();
+  da.push(key);
+  const arr=days[k]||(days[k]=[]);
+  if(!arr.includes(no)) arr.push(no);
+  saveStore();
   const a=todaySnapshot();
   if(a.completed>b.completed){ showToast('🏆 目標を達成しました！おめでとう！',3600); fxFire(); }
   else if(a.allAch && !b.allAch){ showToast('🎯 今日の目標を達成！',3200); fxConfetti(); }
@@ -2626,60 +2657,92 @@ function ringSvg(pct,size){
     <text x="${m}" y="${m}" text-anchor="middle" dominant-baseline="central" font-size="${size*0.22}" font-weight="700" fill="var(--ink)">${pct}%</text></svg>`;
 }
 
-function homeSummaryHtml(){
+function setGoalView(s){ store.goalView=s; saveStore(); renderHome(); }
+function setGoalDir(d){ store.goalDir=d; saveStore(); renderHome(); }
+function startGoalFc(){
+  const slot=store.goalView, g=store.goalSet[slot]; if(!g) return;
+  const s=simGoal(g,todayKey());
+  if(s.completed){ showToast('🏆 この目標はすでに達成済みです'); return; }
+  fcCfg={week:g.from,pos:'all',dir:store.goalDir,order:'seq',src:'goal',slot:slot};
+  startFc();
+}
+function barHtml(pct,planPct){
+  return `<div class="pbar"><i style="width:${pct}%"></i>${planPct!=null?`<u style="left:calc(${planPct}% - 1px)"></u>`:''}</div>`;
+}
+function homeGoalHtml(){
   const st=computeStats(), k=st.today;
-  const n=(store.study.days[k]||[]).length;
-  const act=st.sims.filter(s=>s.status==='active' && s.byDate[k]);
-  const nAch=act.filter(s=>s.byDate[k].achieved).length;
-  const goalTxt=act.length?`${nAch}/${act.length}`:'―';
-  return `<div class="home-sum" onclick="nav('goalHome')">
-    <div><b>🔥 ${st.studyCur}日</b><span>連続勉強日数</span></div>
-    <div><b>${n}語</b><span>今日めくった数</span></div>
-    <div><b>${goalTxt}</b><span>${act.length?'今日の目標 達成':'目標未設定'}</span></div></div>`;
+  const tiles=`<div class="home-sum" onclick="nav('goalHome')">
+    <div><b>${st.total}<small>日</small></b><span>累計日数</span></div>
+    <div><b>🔥${st.studyCur}<small>日</small></b><span>連続日数</span></div>
+    <div><b>${st.studyMax}<small>日</small></b><span>最大連続日数</span></div></div>`;
+  const slot=store.goalView, g=store.goalSet[slot], s=g?st.sims.find(x=>x.g.slot===slot):null;
+  const tabs=`<div class="gtabs">${['short','long'].map(x=>`<button class="${slot===x?'on':''}" onclick="setGoalView('${x}')">${SLOT_LABEL[x]}</button>`).join('')}</div>`;
+  let body='';
+  if(!g){
+    body=`<div class="grange" style="text-align:center">${SLOT_LABEL[slot]}は未設定です。<br>範囲・期限・周回数を決めましょう。</div>
+      <button class="startbtn" onclick="openGoalNew('${slot}')">🎯 ${SLOT_LABEL[slot]}を設定する</button>`;
+  } else {
+    const endTxt = s.status==='completed' ? '🏆 達成！' : (s.status==='overdue' ? '期限切れ' : (s.daysLeft===1?'今日まで':'あと'+s.daysLeft+'日'));
+    const range=`<div class="grange"><b>${rangeLabel(g)}</b>　${g.laps}周<br>${s.words}語 × 2方向 × ${g.laps}周 ＝ <b>${s.total}</b>問<br>期限 <b>${fmtDate(g.end)}</b>（${endTxt}）</div>`;
+    let todayBlk='', allBlk='';
+    if(s.status==='completed'){
+      todayBlk=`<div class="grow"><span class="l">本日の目標</span><span class="r">${fmtShort(s.completedOn)}に達成済み 🏆</span></div>${barHtml(100)}`;
+    } else {
+      const tp=s.todayTarget?Math.min(100,Math.floor(s.todayCount/s.todayTarget*100)):0;
+      todayBlk=`<div class="grow"><span class="l">本日の目標</span><span class="r"><b>${tp}%</b>${s.todayCount}/${s.todayTarget}問</span></div>${barHtml(tp)}`;
+    }
+    const ap=s.total?Math.min(100,Math.floor(s.done/s.total*100)):0;
+    const plan=(s.status==='active')?Math.min(100,Math.round(s.planned/s.total*100)):null;
+    let note='';
+    if(s.status==='overdue') note='期限を過ぎています。「目標の設定・記録」から期限を設定し直せます。';
+    else if(s.status==='active') note=s.diff>0?`計画より${s.diff}問 先行`:(s.diff<0?`計画より${-s.diff}問 遅れ`:'計画どおり');
+    allBlk=`<div class="grow"><span class="l">${SLOT_LABEL[slot]}（全体）</span><span class="r"><b>${ap}%</b>${s.done}/${s.total}問</span></div>${barHtml(ap,plan)}<div class="gnote">${note}</div>`;
+    body=`${range}${todayBlk}${allBlk}
+      <button class="startbtn" style="margin-top:14px" ${s.status==='completed'?'disabled':''} onclick="startGoalFc()">▶ 前回の続きから始める</button>
+      <div class="gdir"><span class="t">出題の方向</span>${['kr2ja','ja2kr'].map(d=>`<div class="chip ${store.goalDir===d?'active':''}" onclick="setGoalDir('${d}')">${d==='kr2ja'?'韓国語→日本語':'日本語→韓国語'}</div>`).join('')}</div>`;
+  }
+  const links=`<div class="glinks"><span onclick="nav('goalHome')">🎯 目標の設定・記録</span><span onclick="openCalendar()">📅 カレンダー</span></div>
+    <div class="glinks" style="margin-top:8px"><span onclick="openDayCards()">🌙 今日の振り返り（${todayCardsCount()}枚）</span></div>`;
+  return `${tiles}<div class="gcard">${tabs}${body}${links}</div>`;
 }
 
 /* ---------- 目標・記録 画面 ---------- */
 function renderGoalHome(){
   titleEl.textContent='目標・記録';
   const st=computeStats(), k=st.today;
-  const nToday=(store.study.days[k]||[]).length;
+  const nToday=studyCnt(k);
   const tiles=[
-    ['合計勉強日数',st.total,''],['連続日数',st.studyCur,''],['最大連続日数',st.studyMax,''],
+    ['累計日数',st.total,''],['連続日数',st.studyCur,''],['最大連続日数',st.studyMax,''],
     ['合計目標到達日数',st.achTotal,'g'],['連続目標到達日数',st.achCur,'g'],['最大連続目標到達日数',st.achMax,'g']
   ].map(t=>`<div class="gtile ${t[2]}"><b>${t[1]}<small>日</small></b><span>${t[0]}</span></div>`).join('');
-  const todayMsg = nToday>=2 ? `今日は${nToday}語めくりました。勉強日にカウント済みです ✅`
-                  : `今日は${nToday}語。あと${2-nToday}語めくると「勉強した日」になります。`;
-
-  const cur=st.sims.filter(s=>s.status==='active'||s.status==='upcoming');
-  const past=st.sims.filter(s=>s.status==='completed'||s.status==='expired');
-  const card=s=>{
-    const g=s.g, per=g.start+' 〜 '+g.end;
+  const todayMsg = nToday>=2 ? `今日は${nToday}枚めくりました。勉強日にカウント済みです ✅`
+                  : `今日は${nToday}枚。あと${2-nToday}枚めくると「勉強した日」になります。`;
+  const card=slot=>{
+    const g=store.goalSet[slot];
+    if(!g) return `<div class="goal-card"><div class="gh"><div><div class="gt">${SLOT_LABEL[slot]}</div><div class="gs">未設定</div></div></div>
+      <button class="startbtn" style="margin-top:10px" onclick="openGoalNew('${slot}')">＋ ${SLOT_LABEL[slot]}を設定する</button></div>`;
+    const s=st.sims.find(x=>x.g.slot===slot);
     let badge='', info='';
     if(s.status==='completed') badge='<span class="gbadge ok">🏆 達成</span>';
-    else if(s.status==='expired') badge='<span class="gbadge ng">期間終了</span>';
-    else if(s.status==='upcoming') badge='<span class="gbadge up">開始前</span>';
-    if(s.status==='active'){
+    else if(s.status==='overdue') badge='<span class="gbadge ng">期限切れ</span>';
+    if(s.status==='completed'){
+      info=`<b>${s.total}</b>問をやりきりました！<br>${fmtDate(s.completedOn)}に達成`;
+    } else {
       const tp=s.todayTarget?Math.min(100,Math.floor(s.todayCount/s.todayTarget*100)):0;
       const tAch=s.todayCount>=s.todayTarget;
-      info=`${s.lap}周目 <b>${s.lapDone}</b>/${s.size}語　全体 <b>${s.done}</b>/${s.total}語<br>残り<b>${s.daysLeft}</b>日<br>
-        今日の新しい単語 <b>${s.todayCount}</b> / 目標<b>${s.todayTarget}</b>語${tAch?' ✅':''}
+      info=`${s.lap}周目 <b>${s.lapDone}</b>/${s.size}問　全体 <b>${s.done}</b>/${s.total}問<br>${s.status==='overdue'?'期限を過ぎています':'残り<b>'+s.daysLeft+'</b>日'}<br>
+        今日 <b>${s.todayCount}</b> / ノルマ<b>${s.todayTarget}</b>問${tAch?' ✅':''}
         <div class="gbar"><i class="${tAch?'ok':''}" style="width:${tp}%"></i></div>`;
-    } else if(s.status==='upcoming'){
-      info=`${fmtDate(g.start)}から開始<br>全${s.total}語（1日あたり約${Math.ceil(s.total/s.daysLeft)}語）`;
-    } else if(s.status==='completed'){
-      info=`<b>${s.total}</b>語をやりきりました！<br>${fmtDate(s.completedOn)}に達成`;
-    } else {
-      info=`<b>${s.done}</b> / ${s.total}語まで進みました（${s.pct}%）`;
     }
     return `<div class="goal-card">
-      <div class="gh"><div><div class="gt">${goalLabel(g)}${badge}</div><div class="gs">${per}　対象 ${s.size}語 ×${g.laps}周＝${s.total}語</div></div>
-        <button class="gx" onclick="deleteGoal('${g.id}')">削除</button></div>
+      <div class="gh"><div><div class="gt">${SLOT_LABEL[slot]}${badge}</div><div class="gs">${rangeLabel(g)} ・ ${g.laps}周　${g.start} 〜 ${g.end}<br>${s.words}語×2方向×${g.laps}周＝${s.total}問</div></div>
+        <div style="display:flex;gap:6px"><button class="gx" onclick="openGoalNew('${slot}')">変更</button><button class="gx" onclick="deleteGoal('${slot}')">削除</button></div></div>
       <div class="gb">${ringSvg(s.pct,86)}<div class="gi">${info}</div></div></div>`;
   };
 
   // 直近14日グラフ
-  const days=store.study.days; const cols=[]; let mx=1;
-  for(let i=13;i>=0;i--){ const d=addDays(k,-i); const c=(days[d]||[]).length; if(c>mx) mx=c; cols.push([d,c]); }
+  const cols=[]; let mx=1;
+  for(let i=13;i>=0;i--){ const d=addDays(k,-i); const c=studyCnt(d); if(c>mx) mx=c; cols.push([d,c]); }
   const chart=`<div class="chart14">${cols.map(([d,c])=>{
     const cls=st.achSet.has(d)?'a':(c>=2?'s':'');
     return `<div class="col"><div class="v">${c||''}</div><div class="bar ${cls}" style="height:${Math.round(c/mx*70)}%"></div><div class="l">${parseKey(d).getDate()}</div></div>`;
@@ -2688,78 +2751,80 @@ function renderGoalHome(){
 
   main.innerHTML=`
     <div class="setup-block"><h3>学習の記録</h3><div class="gtiles">${tiles}</div>
-      <div class="subnote">${todayMsg}<br>「勉強した日」＝その日にフラッシュカードを2枚以上裏返した日。<br>「目標到達日」＝その日有効な目標すべてで、当日の目標数に届いた日。<br>目標が進むのは、範囲内の「新しい単語」（その周でまだ数えていない単語）をめくったときだけです。</div></div>
-    <div class="setup-block"><h3>目標（${cur.length}件）</h3>
-      ${cur.map(card).join('') || '<div class="subnote">進行中の目標はありません。下のボタンから設定しましょう。</div>'}
-      <button class="startbtn" onclick="openGoalNew()">＋ 目標を追加</button></div>
-    <div class="setup-block"><h3>直近14日の学習単語数</h3>${chart}</div>
-    <button class="startbtn" style="background:var(--ink2)" onclick="openCalendar()">📅 カレンダーを見る</button>
-    ${past.length?`<div class="setup-block" style="margin-top:22px"><h3>過去の目標</h3>${past.map(card).join('')}</div>`:''}`;
+      <div class="subnote">${todayMsg}<br>「勉強した日」＝その日にフラッシュカードを2枚以上裏返した日。<br>「目標到達日」＝その日有効な目標すべてで、当日のノルマに届いた日。<br>目標が進むのは、範囲内の「その周でまだ数えていない問題（単語×方向）」をめくったときだけです。</div></div>
+    <div class="setup-block"><h3>目標</h3>
+      ${card('short')}${card('long')}</div>
+    <div class="setup-block"><h3>直近14日の学習数</h3>${chart}</div>
+    <button class="startbtn" style="background:var(--ink2)" onclick="openCalendar()">📅 カレンダーを見る</button>`;
 }
-function deleteGoal(id){
-  const g=store.goals.find(x=>x.id===id); if(!g) return;
-  if(!confirm('この目標を削除しますか？\n'+goalLabel(g)+'\n（学習記録は残りますが、この目標の到達記録は消えます）')) return;
-  store.goals=store.goals.filter(x=>x.id!==id); saveStore(); renderGoalHome();
+function deleteGoal(slot){
+  const g=store.goalSet[slot]; if(!g) return;
+  if(!confirm(SLOT_LABEL[slot]+'を削除しますか？\n'+goalLabel(g)+'\n（学習記録は残りますが、この目標の進捗は消えます）')) return;
+  store.goalSet[slot]=null; saveStore(); renderGoalHome();
 }
 
-/* ---------- 目標の追加 ---------- */
-let goalCfg={from:1,to:1,pn:1,pu:'week',laps:1,start:todayKey()};
-function openGoalNew(){ goalCfg={from:1,to:1,pn:1,pu:'week',laps:1,start:todayKey()}; nav('goalNew'); }
+/* ---------- 目標の設定（短期・長期） ---------- */
+let goalCfg={slot:'short',from:1,to:1,laps:1,end:addDays(todayKey(),29)};
+function openGoalNew(slot){
+  const g=store.goalSet[slot];
+  goalCfg = g ? {slot,from:g.from,to:g.to,laps:g.laps,end:(g.end<todayKey()?addDays(todayKey(),29):g.end)}
+              : {slot,from:1,to:1,laps:1,end:addDays(todayKey(),slot==='long'?179:29)};
+  nav('goalNew');
+}
 function setGoalNum(key,v){
   let n=Math.floor(+v); if(!(n>=1)) n=1;
-  n=Math.min(n,key==='pn'?PN_MAX[goalCfg.pu]:30);
-  goalCfg[key]=n; renderGoalNew();
+  goalCfg[key]=Math.min(n,30); renderGoalNew();
 }
-function setGoalStart(v){
+function setGoalEnd(v){
   if(/^\d{4}-\d{2}-\d{2}$/.test(v)){
-    const min=addDays(todayKey(),-365);
-    goalCfg.start=v<min?min:v;
+    const min=todayKey(), max=addDays(min,365*3);
+    goalCfg.end=v<min?min:(v>max?max:v);
   }
   renderGoalNew();
 }
 function goalPreview(){
-  const c=goalCfg, size=rangeCount(c.from,c.to), total=size*c.laps;
-  const end=goalEnd(c.start,c.pn,c.pu), days=dayNum(end)-dayNum(c.start)+1;
-  const per=Math.ceil(total/days);
-  const valid=days>=c.laps;
-  return {size,total,end,days,per,valid};
+  const c=goalCfg, words=rangeCount(c.from,c.to), size=words*2, total=size*c.laps;
+  const start=todayKey(), days=dayNum(c.end)-dayNum(start)+1;
+  const per=days>0?Math.ceil(total/days):total;
+  const valid=days>=c.laps && days>=1;
+  return {words,size,total,start,days,per,valid};
 }
 function renderGoalNew(){
-  titleEl.textContent='目標を追加';
+  titleEl.textContent=SLOT_LABEL[goalCfg.slot]+'を設定';
   const U=Array.from({length:WEEKS_TOTAL},(_,i)=>i+1);
   const fromC=U.map(u=>`<div class="chip ${goalCfg.from===u?'active':''}" onclick="goalCfg.from=${u};if(goalCfg.to<${u})goalCfg.to=${u};renderGoalNew()">UNIT${u}</div>`).join('');
   const toC=U.map(u=>{ const dis=u<goalCfg.from; return `<div class="chip ${goalCfg.to===u?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="goalCfg.to=${u};renderGoalNew()"`}>UNIT${u}</div>`; }).join('');
-  const puC=['day','week','month'].map(p=>`<div class="chip ${goalCfg.pu===p?'active':''}" onclick="goalCfg.pu='${p}';goalCfg.pn=Math.min(goalCfg.pn,PN_MAX['${p}']);renderGoalNew()">${PU_LABEL[p]}</div>`).join('');
-  const pv=goalPreview();
+  const pv=goalPreview(), c=goalCfg;
   main.innerHTML=`
     <div class="setup-block"><h3>範囲（どこからどこまで）</h3>
       <div class="tabrow">${fromC}</div>
       <div style="text-align:center;font-size:12px;color:var(--sub);margin:4px 0;">〜</div>
       <div class="tabrow">${toC}</div></div>
-    <div class="setup-block"><h3>期間（いつまでに）</h3>
-      <div class="row-inline"><input class="num-in" type="number" inputmode="numeric" min="1" max="${PN_MAX[goalCfg.pu]}" value="${goalCfg.pn}" onchange="setGoalNum('pn',this.value)">
-        <div class="tabs">${puC}</div></div>
-      <div class="row-inline" style="margin-top:10px"><span style="font-size:12.5px;color:var(--sub)">開始日</span>
-        <input class="date-in" type="date" value="${goalCfg.start}" onchange="setGoalStart(this.value)"></div></div>
+    <div class="setup-block"><h3>期限（いつまでに）</h3>
+      <div class="row-inline"><input class="date-in" type="date" min="${todayKey()}" value="${c.end}" onchange="setGoalEnd(this.value)"></div>
+      <div class="subnote">開始日は今日（${fmtDate(pv.start)}）です。カレンダーから期限を選んでください。</div></div>
     <div class="setup-block"><h3>周回数</h3>
-      <div class="row-inline"><input class="num-in" type="number" inputmode="numeric" min="1" max="30" value="${goalCfg.laps}" onchange="setGoalNum('laps',this.value)"><span style="font-size:14px">周</span></div></div>
+      <div class="row-inline"><input class="num-in" type="number" inputmode="numeric" min="1" max="30" value="${c.laps}" onchange="setGoalNum('laps',this.value)"><span style="font-size:14px">周</span></div></div>
     <div class="setup-block"><h3>この目標の内容</h3>
       <div class="prev-box">
-        ${goalCfg.from===goalCfg.to?'UNIT'+goalCfg.from:'UNIT'+goalCfg.from+'〜UNIT'+goalCfg.to}（<b>${pv.size}</b>語）を <b>${goalCfg.laps}</b>周 ＝ <b>${pv.total}</b>語<br>
-        期間：${fmtDate(goalCfg.start)} 〜 ${fmtDate(pv.end)}（${pv.days}日間）<br>
-        ${pv.valid?`1日あたり目安：約<b>${pv.per}</b>語`:`<span class="err">期間が短すぎます。同じ単語は1日1回までなので、周回数（${goalCfg.laps}周）以上の日数が必要です。</span>`}
+        ${rangeLabel(c)}（<b>${pv.words}</b>語）× 2方向（韓国語→日本語・日本語→韓国語）× <b>${c.laps}</b>周 ＝ <b>${pv.total}</b>問<br>
+        期間：${fmtDate(pv.start)} 〜 ${fmtDate(c.end)}（${pv.days}日間）<br>
+        ${pv.valid?`1日あたり目安：約<b>${pv.per}</b>問`:`<span class="err">期間が短すぎます。同じ問題は1日1回までなので、周回数（${c.laps}周）以上の日数が必要です。</span>`}
       </div>
-      <div class="subnote">・進むのは、範囲内の「その周でまだ数えていない単語」をフラッシュカードで裏返したときだけです。同じ周の中で前に勉強した単語をめくり直しても進みません。範囲の全単語を1回ずつ勉強すると1周完了で、次の周は数え直しになります。<br>
-      ・1日の目標は毎日「残りの単語数 ÷ 残りの日数」で再計算されます。休んだ分は翌日以降に自動で上乗せされます。<br>
-      ・目標は複数同時に設定できます。</div></div>
+      <div class="subnote">・1問＝「単語×方向×周」です。両方向がそれぞれ1問として数えられます。<br>
+      ・進むのは、範囲内の「その周でまだ数えていない問題」をフラッシュカードで裏返したときだけです。<br>
+      ・今日のノルマは毎日「残りの問題数 ÷ 残りの日数」で計算し直されます。休んだ分は翌日以降に自動で上乗せされます。<br>
+      ・設定し直すと、今日から数え直します。</div></div>
     <button class="startbtn" ${pv.valid?'':'disabled'} onclick="saveGoal()">この目標で始める</button>`;
 }
 function saveGoal(){
   const c=goalCfg, pv=goalPreview();
   if(!pv.valid) return;
-  store.goals.push({id:Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36),from:c.from,to:c.to,laps:c.laps,pn:c.pn,pu:c.pu,start:c.start,end:pv.end,created:Date.now()});
+  if(store.goalSet[c.slot] && !confirm(SLOT_LABEL[c.slot]+'を上書きします。進捗は今日から数え直しになります。よろしいですか？')) return;
+  store.goalSet[c.slot]={slot:c.slot,from:c.from,to:c.to,laps:c.laps,start:pv.start,end:c.end,created:Date.now()};
+  store.goalView=c.slot;
   saveStore();
-  showToast('🎯 目標を追加しました');
+  showToast('🎯 '+SLOT_LABEL[c.slot]+'を設定しました');
   goBack();
 }
 
@@ -2776,7 +2841,7 @@ function renderCalendar(){
   for(let i=0;i<first.getDay();i++) cells+='<div class="cal-cell empty"></div>';
   for(let d=1;d<=nDays;d++){
     const k=calY+'-'+pad2(calM+1)+'-'+pad2(d);
-    const cnt=(days[k]||[]).length, info=dayInfo(k,st.sims);
+    const cnt=studyCnt(k), info=dayInfo(k,st.sims);
     let cls='';
     if(info.achieved) cls='ach';
     else if(info.active && k<today) cls='miss';
@@ -2790,7 +2855,7 @@ function renderCalendar(){
   let det='';
   if(calSel){
     const nos=days[calSel]||[], info=dayInfo(calSel,st.sims);
-    const rows=info.items.map(i=>`<div>${i.e.achieved?'✅':(calSel<today?'❌':'⏳')} ${goalLabel(i.g)}：目標 <b>${i.e.target}</b>語 ／ 新しい単語 <b>${i.e.count}</b>語</div>`).join('');
+    const rows=info.items.map(i=>`<div>${i.e.achieved?'✅':(calSel<today?'❌':'⏳')} ${goalLabel(i.g)}：ノルマ <b>${i.e.target}</b>問 ／ 新しい問題 <b>${i.e.count}</b>問</div>`).join('');
     det=`<div class="cal-det"><h4>${fmtDate(calSel)}</h4>
       学習した単語：<b>${nos.length}</b>語　${nos.length>=2?'（勉強した日 ✅）':'（勉強日の条件は2枚以上）'}
       ${rows?`<div style="margin-top:6px">${rows}</div>`:'<div style="margin-top:6px;color:var(--sub)">この日に有効な目標はありません。</div>'}
