@@ -315,6 +315,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 .cal-cell.st{background:#e8eef7;border-color:#c5d2e6;}
 .cal-cell.ach{background:var(--ok-bg);border-color:var(--ok);}
 .cal-cell.miss{background:#fbe9e6;border-color:#e9b9b0;}
+.cal-cell.resc{background:#fff3d6;border-color:#e6c36a;}
 .cal-cell.fut{opacity:.55;}
 .cal-cell.today{outline:2px solid var(--accent);outline-offset:-1px;}
 .cal-cell.sel{box-shadow:0 0 0 2px var(--ink);}
@@ -2619,6 +2620,7 @@ function simGoal(g,today){
   const rollCheck=()=>{ while(lapSet.size>=size && cum<total){ lapSet.clear(); lap++; rollIn(); } if(cum>=total) return; };
   for(let k=g.start;k<=today;k=addDays(k,1)){
     if(cum>=total) break;
+    const startCum=cum;
     const left=Math.max(1,dayNum(g.end)-dayNum(k)+1);
     const target=Math.min(size,Math.ceil((total-cum)/left));
     const list=(store.study.dirs[k]||[]).filter(key=>{ const u=WMAP[parseInt(key,10)]; return u>=g.from && u<=g.to; });
@@ -2633,7 +2635,7 @@ function simGoal(g,today){
         rollCheck();
       }
     }
-    const e={date:k,count:dayNew,target,achieved:dayNew>=target,cumAfter:cum};
+    const e={date:k,count:dayNew,target,achieved:dayNew>=target,cumAfter:cum,startCum};
     r.days.push(e); r.byDate[k]=e;
     if(cum>=total){ r.completed=true; r.completedOn=k; }
   }
@@ -2641,7 +2643,11 @@ function simGoal(g,today){
   r.lap=Math.min(lap,g.laps); r.lapDone=r.completed?size:lapSet.size; r.lapKeys=r.completed?new Set():lapSet;
   r.pct=total?Math.min(100,Math.floor(cum/total*100)):0;
   const elapsed=Math.max(1,Math.min(totalDays,dayNum(today)-dayNum(g.start)+1));
-  r.planned=Math.ceil(total*elapsed/totalDays); r.diff=cum-r.planned;
+  r.planned=Math.ceil(total*elapsed/totalDays);   // 当初の計画（均等割り）
+  /* 先行・遅れは「今日のノルマの計算」と同じ基準で出す：今日の開始時点の累計＋今日のノルマ ＝ 今日が終わるまでにいるべき位置。
+     休んだ分・足りなかった分はノルマに上乗せされるので、ノルマを達成していれば「計画どおり」になる。 */
+  { const e0=r.byDate[today]; if(e0) r.planned=Math.min(total,e0.startCum+e0.target); }
+  r.diff=cum-r.planned;
   if(r.completed) r.status='completed';
   else {
     if(today>g.end) r.status='overdue';
@@ -2663,7 +2669,43 @@ function streakCalc(set,today){
   arr.forEach(x=>{ run=(prev && addDays(prev,1)===x)?run+1:1; if(run>max) max=run; prev=x; });
   return {cur,max};
 }
-/* 勉強した日 = その日に2枚以上裏返した日 / 目標到達日 = その日有効な目標がすべて当日のノルマに到達した日 */
+/* 1日だけ休んでも、翌日に「休んだ日のノルマ＋翌日のノルマ」をまとめて学習すれば連続は続く（救済）。
+   目標がある日：目標ごとに 翌日の新しい問題数 ≧ 休んだ日のノルマ＋翌日のノルマ。
+   目標がない日：翌日に4枚以上（2枚×2日分）。救済できるのは1日だけ休んだ場合のみ（連続した2日休みは途切れる）。 */
+const FALLBACK_CATCHUP=4;
+function catchUpBoth(m,sims){ const n=addDays(m,1); return sims.filter(s=>s.byDate[m] && s.byDate[n]); }
+function catchUpOK(m,sims,allowFallback){
+  const n=addDays(m,1), both=catchUpBoth(m,sims);
+  if(both.length) return both.every(s=>s.byDate[n].count>=s.byDate[m].target+s.byDate[n].target);
+  return allowFallback && studyCnt(n)>=FALLBACK_CATCHUP;
+}
+function rescueDays(baseSet,sims,today,allowFallback){
+  const out=new Set();
+  baseSet.forEach(p=>{
+    const m=addDays(p,1);
+    if(baseSet.has(m) || addDays(m,1)>today) return;
+    if(catchUpOK(m,sims,allowFallback)) out.add(m);
+  });
+  return out;
+}
+/* 昨日だけ休み、今日まだ取り戻しきれていないとき：あといくつで連続が続くか */
+function pendingInfo(baseSet,sims,today,allowFallback){
+  const m=addDays(today,-1), p=addDays(today,-2);
+  if(baseSet.has(m) || !baseSet.has(p) || catchUpOK(m,sims,allowFallback)) return null;
+  const both=catchUpBoth(m,sims);
+  if(both.length){
+    let best=null;
+    both.forEach(s=>{
+      const need=s.byDate[m].target+s.byDate[today].target-s.byDate[today].count;
+      if(need>0 && (!best || need>best.need)) best={need,label:SLOT_LABEL[s.g.slot]};
+    });
+    return best;
+  }
+  return allowFallback ? {need:Math.max(1,FALLBACK_CATCHUP-studyCnt(today)),label:''} : null;
+}
+function streakFrom(set,start){ let n=0,k=start; while(set.has(k)){ n++; k=addDays(k,-1); } return n; }
+/* 勉強した日 = その日に2枚以上裏返した日 / 目標到達日 = その日有効な目標がすべて当日のノルマに届いた日
+   連続日数には、救済された日も含める（累計日数には含めない） */
 function computeStats(){
   const today=todayKey();
   const sims=['short','long'].map(s=>store.goalSet[s]).filter(Boolean).map(g=>simGoal(g,today));
@@ -2672,13 +2714,20 @@ function computeStats(){
   const achSet=new Set(), keys=new Set();
   sims.forEach(s=>Object.keys(s.byDate).forEach(k=>keys.add(k)));
   keys.forEach(k=>{ if(dayInfo(k,sims).achieved) achSet.add(k); });
-  const a=streakCalc(studySet,today), b=streakCalc(achSet,today);
-  return {today,sims,studySet,achSet,total:studySet.size,studyCur:a.cur,studyMax:a.max,achTotal:achSet.size,achCur:b.cur,achMax:b.max};
+  const rescueStudy=rescueDays(studySet,sims,today,true), rescueAch=rescueDays(achSet,sims,today,false);
+  const studyLine=new Set([...studySet,...rescueStudy]), achLine=new Set([...achSet,...rescueAch]);
+  const pendS=pendingInfo(studySet,sims,today,true), pendA=pendingInfo(achSet,sims,today,false);
+  const a=streakCalc(studyLine,today), b=streakCalc(achLine,today);
+  const yd=addDays(today,-2);
+  return {today,sims,studySet,achSet,rescueStudy,rescueAch,pendS,pendA,
+    total:studySet.size,studyCur:pendS?streakFrom(studyLine,yd):a.cur,studyMax:a.max,
+    achTotal:achSet.size,achCur:pendA?streakFrom(achLine,yd):b.cur,achMax:b.max};
 }
 function todaySnapshot(){
   const st=computeStats(), k=st.today;
   return {studied:studyCnt(k)>=2, allAch:dayInfo(k,st.sims).achieved,
-          completed:st.sims.filter(s=>s.completed).length, streak:st.studyCur};
+          completed:st.sims.filter(s=>s.completed).length, streak:st.studyCur,
+          rescued:st.rescueStudy.has(addDays(k,-1))};
 }
 /* フラッシュカードを表→裏に裏返したときに呼ばれる（同じ単語・同じ方向は1日1回） */
 function recordFlip(no,dir){
@@ -2693,6 +2742,7 @@ function recordFlip(no,dir){
   saveStore();
   const a=todaySnapshot();
   if(a.completed>b.completed){ showToast('🏆 目標を達成しました！おめでとう！',3600); fxFire(); }
+  else if(a.rescued && !b.rescued){ showToast('🔥 昨日の分を取り戻しました！連続'+a.streak+'日を継続',3400); fxConfetti(); }
   else if(a.allAch && !b.allAch){ showToast('🎯 今日の目標を達成！',3200); fxConfetti(); }
   else if(a.studied && !b.studied){ showToast('🔥 今日の学習を達成！ 連続'+a.streak+'日',2800); }
 }
@@ -2723,6 +2773,7 @@ function homeGoalHtml(){
     <div><b>${st.total}<small>日</small></b><span>累計日数</span></div>
     <div><b>🔥${st.studyCur}<small>日</small></b><span>連続日数</span></div>
     <div><b>${st.studyMax}<small>日</small></b><span>最大連続日数</span></div></div>`;
+  const pend=st.pendS?`<div class="gnote" style="text-align:center;margin:-4px 0 12px;font-size:12.5px">🔥 昨日の分を取り戻すと連続${st.studyCur}日を継続：${st.pendS.label?st.pendS.label+'で':''}あと<b>${st.pendS.need}</b>${st.pendS.label?'問':'枚'}</div>`:'';
   const slot=store.goalView, g=store.goalSet[slot], s=g?st.sims.find(x=>x.g.slot===slot):null;
   const tabs=`<div class="gtabs">${['short','long'].map(x=>`<button class="${slot===x?'on':''}" onclick="setGoalView('${x}')">${SLOT_LABEL[x]}</button>`).join('')}</div>`;
   let body='';
@@ -2751,7 +2802,7 @@ function homeGoalHtml(){
   }
   const links=`<div class="glinks"><span onclick="nav('goalHome')">🎯 目標の設定・記録</span><span onclick="openCalendar()">📅 カレンダー</span></div>
     <div class="glinks" style="margin-top:10px"><span style="font-size:16px;font-weight:700" onclick="openDayCards()">🌙 今日の学習を振り返る（${todayCardsCount()}枚）</span></div>`;
-  return `${tiles}<div class="gcard">${tabs}${body}${links}</div>`;
+  return `${tiles}${pend}<div class="gcard">${tabs}${body}${links}</div>`;
 }
 
 /* ---------- 目標・記録 画面 ---------- */
@@ -2765,6 +2816,7 @@ function renderGoalHome(){
   ].map(t=>`<div class="gtile ${t[2]}"><b>${t[1]}<small>日</small></b><span>${t[0]}</span></div>`).join('');
   const todayMsg = nToday>=2 ? `今日は${nToday}枚めくりました。勉強日にカウント済みです ✅`
                   : `今日は${nToday}枚。あと${2-nToday}枚めくると「勉強した日」になります。`;
+  const pendMsg=st.pendS?`<br>🔥 昨日の分を取り戻すと連続${st.studyCur}日を継続できます（${st.pendS.label?st.pendS.label+'で':''}あと${st.pendS.need}${st.pendS.label?'問':'枚'}）。`:'';
   const card=slot=>{
     const g=store.goalSet[slot];
     if(!g) return `<div class="goal-card"><div class="gh"><div><div class="gt">${SLOT_LABEL[slot]}</div><div class="gs">未設定</div></div></div>
@@ -2799,7 +2851,7 @@ function renderGoalHome(){
 
   main.innerHTML=`
     <div class="setup-block"><h3>学習の記録</h3><div class="gtiles">${tiles}</div>
-      <div class="subnote">${todayMsg}<br>「勉強した日」＝その日にフラッシュカードを2枚以上裏返した日。<br>「目標到達日」＝その日有効な目標すべてで、当日のノルマに届いた日。<br>目標が進むのは、範囲内の「その周でまだ数えていない問題（単語×方向）」をめくったときだけです。</div></div>
+      <div class="subnote">${todayMsg}${pendMsg}<br>「勉強した日」＝その日にフラッシュカードを2枚以上裏返した日。<br>「目標到達日」＝その日有効な目標すべてで、当日のノルマに届いた日。<br>1日だけ休んだときは、翌日に「休んだ日のノルマ＋翌日のノルマ」をまとめて学習すれば、連続日数が続きます（目標がない場合は翌日に4枚以上）。2日続けて休むと途切れます。<br>目標が進むのは、範囲内の「その周でまだ数えていない問題（単語×方向）」をめくったときだけです。</div></div>
     <div class="setup-block"><h3>目標</h3>
       ${card('short')}${card('long')}</div>
     <div class="setup-block"><h3>直近14日の学習数</h3>${chart}</div>
@@ -2894,28 +2946,30 @@ function renderCalendar(){
     const k=calY+'-'+pad2(calM+1)+'-'+pad2(d);
     const cnt=studyCnt(k), info=dayInfo(k,st.sims);
     let cls='';
+    const resc=st.rescueStudy.has(k)||st.rescueAch.has(k);
     if(info.achieved) cls='ach';
+    else if(resc) cls='resc';
     else if(info.active && k<today) cls='miss';
     else if(cnt>=2) cls='st';
     if(k>today) cls+=' fut';
     if(k===today) cls+=' today';
     if(k===calSel) cls+=' sel';
     if(cnt>=2) mStudy++; if(info.achieved) mAch++; mWords+=cnt;
-    cells+=`<div class="cal-cell ${cls}" onclick="calPick('${k}')"><span class="cd">${d}</span>${cnt?`<span class="cn">${cnt}</span>`:''}${info.achieved?'<span class="cm">✓</span>':''}</div>`;
+    cells+=`<div class="cal-cell ${cls}" onclick="calPick('${k}')"><span class="cd">${d}</span>${cnt?`<span class="cn">${cnt}</span>`:''}${info.achieved?'<span class="cm">✓</span>':(resc?'<span class="cm" style="color:#b07a00">救</span>':'')}</div>`;
   }
   let det='';
   if(calSel){
     const nos=days[calSel]||[], info=dayInfo(calSel,st.sims);
     const rows=info.items.map(i=>`<div>${i.e.achieved?'✅':(calSel<today?'❌':'⏳')} ${goalLabel(i.g)}：ノルマ <b>${i.e.target}</b>問 ／ 新しい問題 <b>${i.e.count}</b>問</div>`).join('');
     det=`<div class="cal-det"><h4>${fmtDate(calSel)}</h4>
-      学習した単語：<b>${nos.length}</b>語　${nos.length>=2?'（勉強した日 ✅）':'（勉強日の条件は2枚以上）'}
+      学習した単語：<b>${nos.length}</b>語　${nos.length>=2?'（勉強した日 ✅）':(st.rescueStudy.has(calSel)||st.rescueAch.has(calSel)?'（休んだ日・翌日に取り戻して連続を継続 🩹）':'（勉強日の条件は2枚以上）')}
       ${rows?`<div style="margin-top:6px">${rows}</div>`:'<div style="margin-top:6px;color:var(--sub)">この日に有効な目標はありません。</div>'}
       ${nos.length?`<div class="cal-words">${nos.map(n=>WBY[n]).filter(Boolean).map(w=>`<span>${w.kr} <small>${w.ja}</small></span>`).join('')}</div><button class="startbtn" style="margin-top:10px" onclick="openDayCards('${calSel}')">この日のカードを復習・テスト</button>`:''}</div>`;
   }
   main.innerHTML=`
     <div class="cal-head"><button onclick="calMove(-1)">‹</button><b>${calY}年 ${calM+1}月</b><button onclick="calMove(1)">›</button></div>
     <div class="cal-grid">${DOW.map(x=>`<div class="cal-dow">${x}</div>`).join('')}${cells}</div>
-    <div class="cal-leg"><span><i style="background:var(--ok-bg);border-color:var(--ok)"></i>目標到達</span><span><i style="background:#e8eef7"></i>勉強した日</span><span><i style="background:#fbe9e6"></i>目標未達</span><span>数字＝その日にめくった単語数</span></div>
+    <div class="cal-leg"><span><i style="background:var(--ok-bg);border-color:var(--ok)"></i>目標到達</span><span><i style="background:#e8eef7"></i>勉強した日</span><span><i style="background:#fbe9e6"></i>目標未達</span><span><i style="background:#fff3d6;border-color:#e6c36a"></i>救済（翌日に取り戻し）</span><span>数字＝その日にめくった単語数</span></div>
     ${det}
     <div class="subnote" style="margin-top:14px">${calM+1}月：勉強した日 <b>${mStudy}</b>日 ／ 目標到達 <b>${mAch}</b>日 ／ 合計 <b>${mWords}</b>語</div>`;
 }
