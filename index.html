@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#a6321f">
-<title>단어장 — ハングル3級単語帳</title>
+<title>단어장 — ハングル4～3級単語帳</title>
 
   <!-- === PWA ホーム画面追加機能（「한」アイコン）=== -->
   <link rel="manifest" href="manifest.json">
@@ -12,7 +12,7 @@
   <!-- iOS対応 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="ハングル3級単語帳">
+  <meta name="apple-mobile-web-app-title" content="ハングル4～3級単語帳">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="apple-touch-icon" href="icon-192.png">
 
@@ -233,6 +233,12 @@ table.wl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
 .iv-new{background:#fff3c4;}
 .iv-ok{color:#1f9d55;font-weight:700;}.iv-ng{color:#d33;font-weight:700;}.iv-re{color:#c98a00;font-weight:700;}
 input,textarea{-webkit-user-select:text;user-select:text;}
+.lvsw{display:flex;gap:8px;margin:0 0 14px;}
+.lvbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border:1.5px solid var(--line2);border-radius:12px;background:var(--card);color:var(--ink);font-family:inherit;cursor:pointer;}
+.lvbtn b{font-size:17px;}
+.lvbtn small{font-size:11px;color:var(--sub);}
+.lvbtn.on{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:var(--shadow);}
+.lvbtn.on small{color:#cdd6e3;}
 .sbar{display:flex;gap:8px;margin:0 0 16px;}
 .sbar input{flex:1;min-width:0;padding:11px 12px;border:1px solid var(--line2);border-radius:10px;font-size:15px;background:#fff;color:var(--ink);font-family:inherit;}
 .sbar button{padding:0 18px;border:none;border-radius:10px;background:var(--ink);color:#fff;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;}
@@ -335,15 +341,16 @@ input,textarea{-webkit-user-select:text;user-select:text;}
   <div id="topbar">
     <div class="back" id="backBtn" onclick="goHome()">←</div>
     <h1 id="pageTitle">단어장</h1>
-    <div class="stamp">전 8 UNIT</div>
+    <div class="stamp" id="levelStamp">전 8 UNIT</div>
   </div>
   <div id="main"></div>
 </div>
 <div id="modalRoot"></div>
 
+<script src="words4.js"></script>
 <script>
-/* ============ 1주차 단어 데이터 ============ */
-const WORDS = [
+/* ============ 3級 単語データ（4級は words4.js） ============ */
+const WORDS3 = [
 {no:1,pos:'n',kr:'가격',hanja:'價格',ja:'価格',note:'値段。商品の値を表す時に使う。「값」とほぼ同じ意味。',ex:'이 가방은 가격이 너무 비싸요.',exja:'このかばんは価格がとても高いです。',ex2:'가격을 비교해 보고 샀어요.',exja2:'価格を比較してから買いました。',exen:'This bag is very expensive.',ex2en:'I compared the prices before buying it.'},
 {no:2,pos:'n',kr:'가능성',hanja:'可能性',ja:'可能性',note:'「가능성이 있다/없다」の形でよく使われる。',ex:'내일 비가 올 가능성이 있어요.',exja:'明日雨が降る可能性があります。',ex2:'그 계획이 성공할 가능성은 낮아요.',exja2:'その計画が成功する可能性は低いです。',exen:'There\'s a chance of rain tomorrow.',ex2en:'The chances of that plan succeeding are low.'},
 {no:3,pos:'n',kr:'가루',ja:'粉',note:'固有語。밀가루（小麦粉）、고춧가루（唐辛子粉）のように複合語で多用。',ex:'밀가루로 빵을 만들었어요.',exja:'小麦粉でパンを作りました。',ex2:'커피 가루가 바닥에 쏟아졌어요.',exja2:'コーヒーの粉が床にこぼれました。',exen:'I made bread with flour.',ex2en:'Coffee grounds spilled on the floor.'},
@@ -1241,14 +1248,32 @@ const WORDS = [
 {no:895,pos:'n',kr:'흥미',hanja:'興味',ja:'興味',note:'',ex:'역사에 흥미가 있어요.',exja:'歴史に興味があります。',ex2:'흥미로운 이야기예요.',exja2:'興味深い話です。',exen:'I\'m interested in history.',ex2en:'It\'s an interesting story.',week:8},
 {no:896,pos:'n',kr:'흰색',hanja:'白色',ja:'白色',note:'',ex:'흰색 셔츠를 입었어요.',exja:'白いシャツを着ました。',ex2:'흰색이 잘 어울려요.',exja2:'白色がよく似合います。',exen:'I wore a white shirt.',ex2en:'White suits me well.',week:8},
 ];
-WORDS.forEach(w=>{ if(!w.week) w.week=1; });
+WORDS3.forEach(w=>{ if(!w.week) w.week=1; });
+
+/* ============ 級（4級／3級）の切り替え ============
+   選んだ級は端末に記憶。切り替えるとページを再読み込みして、その級の単語・記録に入れ替える。 */
+const LEVEL_KEY='hangul_level_v1';
+let LEVEL='3';
+try{ if(localStorage.getItem(LEVEL_KEY)==='4' && typeof WORDS4!=='undefined') LEVEL='4'; }catch(e){}
+const WORDS = LEVEL==='4' ? WORDS4 : WORDS3;
+const LEVEL_UNITS = {'3':8,'4':9};
+function setLevel(lv){ try{ localStorage.setItem(LEVEL_KEY, lv); }catch(e){} location.reload(); }
+function switchLevel(lv){ if(lv!==LEVEL) setLevel(lv); }
+function levelSwitchHtml(){
+  const n3=WORDS3.length, n4=(typeof WORDS4!=='undefined')?WORDS4.length:0;
+  const b=(lv,label,n)=>`<button class="lvbtn${LEVEL===lv?' on':''}" onclick="switchLevel('${lv}')"><b>${label}</b><small>${n}語・${LEVEL_UNITS[lv]} UNIT</small></button>`;
+  return `<div class="lvsw">${n4?b('4','4級',n4):''}${b('3','3級',n3)}</div>`;
+}
+document.getElementById('levelStamp').textContent = LEVEL+'級 · 전 '+LEVEL_UNITS[LEVEL]+' UNIT';
 
 const POS_LABEL = {n:'名詞', v:'動詞', adv:'副詞', a:'形容詞'};
-const WEEKS_TOTAL = 8;
-const AVAILABLE_WEEKS = 8;
+const WEEKS_TOTAL = LEVEL_UNITS[LEVEL];
+const AVAILABLE_WEEKS = WEEKS_TOTAL;
 
 /* ============ ストレージ ============ */
-const STORE_KEY='hangul3_progress_v1';
+const STORE_KEYS={'3':'hangul3_progress_v1','4':'hangul4_progress_v1'};
+const STORE_KEY=STORE_KEYS[LEVEL];
+const OTHER_KEY=STORE_KEYS[LEVEL==='4'?'3':'4'];
 /* 「覚えた」「また後で」は方向別（kr2ja=韓国語→日本語 / ja2kr=日本語→韓国語）に管理する。
    旧形式（配列）のデータは、両方向にコピーして引き継ぐ。 */
 function normDirSets(v){
@@ -1282,6 +1307,10 @@ function normStore(o){
 let store;
 try{ store = normStore(JSON.parse(localStorage.getItem(STORE_KEY)||'null')); }catch(e){ store = normStore(null); }
 function saveStore(){ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+/* もう一方の級の学習日（連続日数・累計日数を級をまたいで数えるために読み取り専用で使う） */
+let otherStudy={days:{},dirs:{}};
+try{ otherStudy = normStore(JSON.parse(localStorage.getItem(OTHER_KEY)||'null')).study; }catch(e){}
+function otherCnt(k){ return Math.max((otherStudy.days[k]||[]).length,(otherStudy.dirs[k]||[]).length); }
 function isMastered(no,dir){ return store.mastered[dir||fcCfg.dir].includes(no); }
 function isReview(no,dir){ return store.review[dir||fcCfg.dir].includes(no); }
 function dirLabel(d){ return d==='ja2kr' ? '日本語→韓国語' : '韓国語→日本語'; }
@@ -1367,6 +1396,7 @@ function render(){
 function renderHome(){
   titleEl.textContent='단어장';
   main.innerHTML = `
+    ${levelSwitchHtml()}
     ${homeGoalHtml()}
     <div class="sbar">
       <input id="homeQ" type="search" placeholder="単語を検索（韓国語・日本語）" onkeydown="if(event.key==='Enter')homeSearch()">
@@ -1436,7 +1466,7 @@ function renderDataManage(){
 
   main.innerHTML = `
     <div class="setup-block">
-      <h3>現在の記録</h3>
+      <h3>現在の記録（${LEVEL}級）</h3>
       <div class="menu-card" style="cursor:default;">
         <div class="ico">📊</div>
         <div class="tx"><b>韓国語→日本語　覚えた: ${store.mastered.kr2ja.length}語 ／ また後で: ${store.review.kr2ja.length}語</b><b>日本語→韓国語　覚えた: ${store.mastered.ja2kr.length}語 ／ また後で: ${store.review.ja2kr.length}語</b><span>マッチング記録: ${matchCount}件</span></div>
@@ -1445,13 +1475,13 @@ function renderDataManage(){
 
     <div class="setup-block">
       <h3>書き出し（バックアップ）</h3>
-      <div class="subnote" style="margin-bottom:10px;">学習記録をファイルとして保存します。機種変更やブラウザデータ消去に備えて、定期的に書き出しておくことをおすすめします。</div>
+      <div class="subnote" style="margin-bottom:10px;">4級・3級の学習記録をまとめてファイルとして保存します。機種変更やブラウザデータ消去に備えて、定期的に書き出しておくことをおすすめします。</div>
       <button class="startbtn" onclick="exportStore()">📤 ファイルに書き出す（.json）</button>
     </div>
 
     <div class="setup-block">
       <h3>読み込み（復元・移行）</h3>
-      <div class="subnote" style="margin-bottom:10px;">書き出したファイルを選ぶと、この端末に記録を反映します。<br><b>現在この端末にある記録は上書きされます。</b></div>
+      <div class="subnote" style="margin-bottom:10px;">書き出したファイルを選ぶと、この端末に記録を反映します。<br>以前の3級のみのファイルは3級の記録として読み込まれます。<br><b>現在この端末にある記録は上書きされます。</b></div>
       <input type="file" id="importFileInput" accept="application/json,.json" style="display:none;" onchange="importStoreFromFile(event)">
       <button class="startbtn" style="background:var(--ink2);" onclick="document.getElementById('importFileInput').click()">📥 ファイルから読み込む</button>
     </div>
@@ -1459,7 +1489,7 @@ function renderDataManage(){
     <div class="setup-block">
       <h3>テキストとしてコピー／貼り付け</h3>
       <div class="subnote" style="margin-bottom:10px;">ファイル保存が難しい場合は、下のテキストをコピーして別端末のメモ等に保管し、貼り付けて読み込むこともできます。</div>
-      <textarea id="dataText" readonly style="width:100%;min-height:90px;font-size:11px;padding:10px;border:1px solid var(--line2);border-radius:8px;background:var(--card);color:var(--ink);font-family:monospace;" onclick="this.select()">${JSON.stringify(store)}</textarea>
+      <textarea id="dataText" readonly style="width:100%;min-height:90px;font-size:11px;padding:10px;border:1px solid var(--line2);border-radius:8px;background:var(--card);color:var(--ink);font-family:monospace;" onclick="this.select()">${JSON.stringify(exportPayload())}</textarea>
       <div style="display:flex;gap:8px;margin-top:8px;">
         <button class="startbtn" style="flex:1;" onclick="copyDataText()">コピー</button>
       </div>
@@ -1467,30 +1497,39 @@ function renderDataManage(){
       <button class="startbtn" style="margin-top:8px;background:var(--ink2);" onclick="importStoreFromText()">このテキストを読み込む</button>
     </div>
 
-    <div class="footer-note">書き出しファイル名の例: hangul3_progress_${todayStr}.json</div>
+    <div class="footer-note">書き出しファイル名の例: hangul_progress_${todayStr}.json</div>
   `;
 }
 
+function loadStoreByKey(key){
+  try{ return normStore(JSON.parse(localStorage.getItem(key)||'null')); }catch(e){ return normStore(null); }
+}
+/* 4級・3級の記録をまとめた書き出し用データ */
+function exportPayload(){
+  return {app:'hangul-tango', version:2, levels:{
+    '3': LEVEL==='3' ? store : loadStoreByKey(STORE_KEYS['3']),
+    '4': LEVEL==='4' ? store : loadStoreByKey(STORE_KEYS['4'])
+  }};
+}
 function exportStore(){
-  const data = JSON.stringify(store, null, 2);
+  const data = JSON.stringify(exportPayload(), null, 2);
   const blob = new Blob([data], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const todayStr = new Date().toISOString().slice(0,10);
   a.href = url;
-  a.download = `hangul3_progress_${todayStr}.json`;
+  a.download = `hangul_progress_${todayStr}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-function applyImportedStore(obj){
-  if(!obj || typeof obj !== 'object' || !obj.mastered || typeof obj.mastered !== 'object' || !obj.review || typeof obj.review !== 'object'){
-    alert('読み込みに失敗しました。ファイル／テキストの形式が正しくないようです。');
-    return false;
-  }
-  store = normStore({
+function validStoreObj(o){
+  return !!(o && typeof o==='object' && o.mastered && typeof o.mastered==='object' && o.review && typeof o.review==='object');
+}
+function buildImported(obj){
+  return normStore({
     mastered: obj.mastered,   // 旧形式（配列）なら両方向にコピーされる
     review: obj.review,
     matchBest: obj.matchBest || {},
@@ -1503,10 +1542,26 @@ function applyImportedStore(obj){
     goalView: obj.goalView,
     goalDir: obj.goalDir
   });
-  invSet = store.invSet || {bgm:true,se:true};
-  saveStore();
-  alert('読み込みが完了しました。');
-  nav('dataManage', false);
+}
+function applyImportedStore(obj){
+  const found = {};
+  if(obj && typeof obj==='object' && obj.levels && typeof obj.levels==='object'){
+    ['3','4'].forEach(lv=>{ if(validStoreObj(obj.levels[lv])) found[lv]=obj.levels[lv]; });
+  } else if(validStoreObj(obj)){
+    found['3'] = obj;   // 旧形式（3級のみ）は3級の記録として読み込む
+  }
+  const lvs = Object.keys(found);
+  if(!lvs.length){
+    alert('読み込みに失敗しました。ファイル／テキストの形式が正しくないようです。');
+    return false;
+  }
+  lvs.forEach(lv=>{
+    const st = buildImported(found[lv]);
+    if(lv===LEVEL){ store = st; invSet = store.invSet || {bgm:true,se:true}; saveStore(); }
+    else { localStorage.setItem(STORE_KEYS[lv], JSON.stringify(st)); }
+  });
+  alert('読み込みが完了しました（' + lvs.map(l=>l+'級').join('・') + '）。');
+  location.reload();
   return true;
 }
 
@@ -2594,7 +2649,7 @@ function openWordModal(no){
    1問 = 単語×方向×周。範囲の単語数×2方向×周回数 が目標の総問題数。 */
 const SLOT_LABEL={short:'短期目標',long:'長期目標'};
 function dirKey(no,dir){ return no+(dir==='ja2kr'?':j':':k'); }
-function studyCnt(k){ return Math.max((store.study.days[k]||[]).length,(store.study.dirs[k]||[]).length); }
+function studyCnt(k){ return Math.max((store.study.days[k]||[]).length,(store.study.dirs[k]||[]).length)+otherCnt(k); }
 function rangeCount(from,to){ return WORDS.filter(w=>w.week>=from && w.week<=to).length; }
 function rangeLabel(g){ return g.from===g.to?'UNIT'+g.from:'UNIT'+g.from+'〜UNIT'+g.to; }
 function goalLabel(g){ return SLOT_LABEL[g.slot]+' ・ '+rangeLabel(g)+' ・ '+g.laps+'周'; }
@@ -2709,7 +2764,7 @@ function streakFrom(set,start){ let n=0,k=start; while(set.has(k)){ n++; k=addDa
 function computeStats(){
   const today=todayKey();
   const sims=['short','long'].map(s=>store.goalSet[s]).filter(Boolean).map(g=>simGoal(g,today));
-  const allKeys=new Set([...Object.keys(store.study.days),...Object.keys(store.study.dirs)]);
+  const allKeys=new Set([...Object.keys(store.study.days),...Object.keys(store.study.dirs),...Object.keys(otherStudy.days),...Object.keys(otherStudy.dirs)]);
   const studySet=new Set([...allKeys].filter(k=>studyCnt(k)>=2));
   const achSet=new Set(), keys=new Set();
   sims.forEach(s=>Object.keys(s.byDate).forEach(k=>keys.add(k)));

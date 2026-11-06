@@ -1,12 +1,12 @@
-// ハングル3級単語帳 用 Service Worker
+// ハングル4～3級単語帳 用 Service Worker
 // - インストール時に必要なファイルを全部キャッシュ → 完全オフラインで起動できる
 // - ネットワークがあれば最新版を取得してキャッシュを更新（GitHubで更新すれば自動で反映）
 // - ネットワークが遅い／無いときはキャッシュから即表示
 // - 同じ github.io 上の他アプリのキャッシュには触れない（このアプリ専用の接頭辞だけ管理）
 const PREFIX = 'hangul3-tango-';
-const CACHE = PREFIX + 'v3';   // 下記 PRECACHE の中身を増減したときだけ数字を上げる
+const CACHE = PREFIX + 'v4';   // 下記 PRECACHE の中身を増減したときだけ数字を上げる
 const INDEX = new URL('index.html', self.registration.scope).href;
-const REQUIRED = ['index.html'];
+const REQUIRED = ['index.html', 'words4.js'];
 const OPTIONAL = ['./', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 const NET_TIMEOUT = 3000;      // この時間(ms)返事が無ければキャッシュを先に出す
 
