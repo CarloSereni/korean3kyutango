@@ -133,6 +133,9 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
   font-size:13.5px;font-weight:700;cursor:pointer;color:var(--ink);}
 .act-btn.memo{color:var(--ok);border-color:var(--ok);background:var(--ok-bg);}
 .act-btn.later{color:var(--keep);border-color:var(--keep);background:var(--keep-bg);}
+.act-btn.undo{flex:0 0 auto;min-width:78px;padding:13px 10px;color:var(--ink2);background:#fff;}
+.act-btn:disabled{opacity:.35;cursor:not-allowed;}
+.undo-wide{background:#fff;color:var(--ink2);border:1px solid var(--line2);box-shadow:none;}
 .deckdone{text-align:center;padding:60px 10px;color:var(--sub);}
 .deckdone .big{font-size:40px;margin-bottom:10px;}
 
@@ -1357,6 +1360,7 @@ let history_stack=[];
 function nav(to, push=true){
   if(screen==='invView'&&to!=='invView') invStop();
   if(screen==='fcView'&&to!=='fcView') stopSpeech();
+  if(to==='fcView'&&screen!=='fcView') fcUndoStack=[];
   if(push) history_stack.push(screen);
   screen=to;
   document.getElementById('backBtn').classList.toggle('hidden', history_stack.length===0);
@@ -1613,6 +1617,7 @@ function copyDataText(){
 let fcCfg = {week:1, pos:'all', dir:'kr2ja', order:'seq', src:'all'};
 function renderFcSetup(){
   if(fcCfg.src==='day'){ fcCfg.src='all'; delete fcCfg.date; }
+  if(fcCfg.src==='new') fcCfg.src='all';
   titleEl.textContent='フラッシュカード設定';
   const weekChips = Array.from({length:WEEKS_TOTAL},(_,i)=>i+1).map(w=>{
     const dis = w>AVAILABLE_WEEKS;
@@ -1635,11 +1640,21 @@ function renderFcSetup(){
     <div class="setup-block">
       <div class="menu-card" style="padding:14px;" onclick="resumeSession()">
         <div class="ico">↺</div>
-        <div class="tx"><b>前回の続きから再開</b><span>${store.lastSession.src==='day'?dayCardsLabel(store.lastSession.date):'UNIT'+store.lastSession.week} ・ ${store.lastSession.idx+1}/${store.lastSession.deckNos.length}語目</span></div>
+        <div class="tx"><b>前回の続きから再開</b><span>${store.lastSession.src==='day'?dayCardsLabel(store.lastSession.date):store.lastSession.src==='new'?'新しい単語':'UNIT'+store.lastSession.week} ・ ${store.lastSession.idx+1}/${store.lastSession.deckNos.length}語目</span></div>
       </div>
     </div>` : '';
 
+  const newCount = unstudiedWords(fcCfg.dir).length;
+  const newBlock = `
+    <div class="setup-block">
+      <div class="menu-card" style="padding:14px;${newCount===0?'opacity:.55;':''}" onclick="startNewFc()">
+        <div class="ico">🌱</div>
+        <div class="tx"><b>新しい単語から始める</b><span>${dirLabel(fcCfg.dir)} ・ まだ勉強していない単語 ${newCount}語（${Math.min(NEW_BATCH,newCount)}枚ずつ）</span></div>
+      </div>
+    </div>`;
+
   main.innerHTML = `
+    ${newBlock}
     ${resumeBlock}
     <div class="setup-block">
       <h3>UNIT</h3>
@@ -1690,6 +1705,11 @@ function buildFcDeck(){
     return WORDS.filter(w=>w.week>=g.from && w.week<=g.to && !isMastered(w.no,fcCfg.dir)).sort((a,b)=>a.no-b.no);
   }
   if(fcCfg.src==='day'){ let dp=(store.study.days[fcCfg.date]||[]).map(n=>WBY[n]).filter(Boolean); if(fcCfg.order==='rand') dp=shuffleArr(dp.slice()); return dp; }
+  if(fcCfg.src==='new'){
+    let nw = unstudiedWords(fcCfg.dir).slice(0,NEW_BATCH);
+    if(fcCfg.order==='rand') nw = shuffleArr(nw.slice());
+    return nw;
+  }
   let pool = WORDS.filter(w=>w.week===fcCfg.week);
   if(fcCfg.pos!=='all') pool = pool.filter(w=>w.pos===fcCfg.pos);
   if(fcCfg.src==='review') pool = pool.filter(w=>isReview(w.no));
@@ -1700,6 +1720,47 @@ function buildFcDeck(){
 function shuffleArr(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
 let fcDeck=[], fcIdx=0, fcFlipped=false, fcRemoved={};
+let fcUndoStack=[];            // 「覚えた」「また後で」の取り消し用履歴（このセットを開いている間だけ保持）
+const FC_UNDO_MAX=20;          // 取り消しで続けてさかのぼれる回数
+const NEW_BATCH=20;            // 「新しい単語から始める」で1回に出す枚数
+
+/* ---- 新しい単語から始める ----
+   「まだ勉強していない」＝その方向で、「覚えた」「また後で」に入っておらず、一度も裏返していない単語。
+   学習記録（store.study）は方向別に残っているので、それを全日分たどって判定する。 */
+function studiedNos(dir){
+  const suf = dir==='ja2kr' ? ':j' : ':k';
+  const s = new Set();
+  const dirs = store.study.dirs, days = store.study.days;
+  Object.keys(dirs).forEach(k=>{
+    (dirs[k]||[]).forEach(key=>{ if(String(key).endsWith(suf)) s.add(parseInt(key,10)); });
+  });
+  // 方向別の記録がなかった頃の学習日は、両方向とも勉強済みとして扱う
+  Object.keys(days).forEach(k=>{
+    if(!(dirs[k] && dirs[k].length)) (days[k]||[]).forEach(n=>s.add(n));
+  });
+  return s;
+}
+function unstudiedWords(dir){
+  const st = studiedNos(dir);
+  return WORDS.filter(w=>!st.has(w.no) && !isMastered(w.no,dir) && !isReview(w.no,dir))
+              .sort((a,b)=>(a.week-b.week)||(a.no-b.no));
+}
+function startNewFc(){
+  if(!unstudiedWords(fcCfg.dir).length){
+    showToast('この方向では、まだ勉強していない単語はありません 🎉',3200);
+    return;
+  }
+  fcCfg.src='new';
+  delete fcCfg.date;
+  startFc();
+}
+function fcNextNewBtn(){
+  const n = (fcCfg.src==='new') ? unstudiedWords(fcCfg.dir).length : 0;
+  return n ? `<button class="startbtn" onclick="startNewFc()">🌱 続けて新しい単語へ（残り${n}語）</button>` : '';
+}
+function fcUndoWide(){
+  return fcUndoStack.length ? `<button class="startbtn undo-wide" onclick="fcUndo()">↩ 取り消し</button>` : '';
+}
 /* 目標のカード一覧で、現在の周でまだ数えていない最初のカード（番号が最小）の位置 */
 function goalStartIdx(){
   const g=store.goalSet[fcCfg.slot]; if(!g) return 0;
@@ -1733,15 +1794,15 @@ function resumeSession(){
 }
 
 function renderFcView(noAuto){
-  titleEl.textContent = fcCfg.src==='goal' ? ((SLOT_LABEL[fcCfg.slot]||'目標')+' ・ '+dirLabel(fcCfg.dir)) : fcCfg.src==='day' ? (dayCardsLabel(fcCfg.date)+'の復習') : 'UNIT'+(fcCfg.week)+' · '+(fcCfg.pos==='all'?'全品詞':POS_LABEL[fcCfg.pos]);
+  titleEl.textContent = fcCfg.src==='goal' ? ((SLOT_LABEL[fcCfg.slot]||'目標')+' ・ '+dirLabel(fcCfg.dir)) : fcCfg.src==='day' ? (dayCardsLabel(fcCfg.date)+'の復習') : fcCfg.src==='new' ? ('新しい単語 ・ '+dirLabel(fcCfg.dir)) : 'UNIT'+(fcCfg.week)+' · '+(fcCfg.pos==='all'?'全品詞':POS_LABEL[fcCfg.pos]);
   if(fcDeck.length===0){
-    main.innerHTML = `<div class="deckdone"><div class="big">🎉</div>この条件のカードはありません。<br>（すべて覚えたセットに入っているか、条件に合う単語がありません）
-    <div style="margin-top:16px;"><button class="startbtn" onclick="nav('fcSetup')">設定に戻る</button></div></div>`;
+    main.innerHTML = `<div class="deckdone"><div class="big">🎉</div>${fcCfg.src==='new'?'このセットは最後まで確認しました。':'この条件のカードはありません。<br>（すべて覚えたセットに入っているか、条件に合う単語がありません）'}
+    <div style="margin-top:16px;">${fcNextNewBtn()}<button class="startbtn" onclick="nav('fcSetup')">設定に戻る</button>${fcUndoWide()}</div></div>`;
     return;
   }
   if(fcIdx>=fcDeck.length){
     main.innerHTML = `<div class="deckdone"><div class="big">✅</div>このセットは最後まで確認しました。<br>
-    <div style="margin-top:16px;"><button class="startbtn" onclick="fcIdx=0;renderFcView()">もう一度見る</button></div></div>`;
+    <div style="margin-top:16px;">${fcNextNewBtn()}<button class="startbtn" onclick="fcIdx=0;renderFcView()">もう一度見る</button>${fcUndoWide()}</div></div>`;
     return;
   }
   const w = fcDeck[fcIdx];
@@ -1801,6 +1862,7 @@ function renderFcView(noAuto){
     <div class="card-actions">
       <button class="act-btn memo" onclick="fcMark('mastered')">✅ 覚えた</button>
       <button class="act-btn later" onclick="fcMark('review')">🔖 また後で</button>
+      <button class="act-btn undo" onclick="fcUndo()" ${fcUndoStack.length?'':'disabled'}>↩ 取り消し</button>
     </div>
   `;
   const outer=document.getElementById('cardOuter');
@@ -1850,7 +1912,17 @@ function fcNav(dir){
 }
 function fcMark(type){
   const w=fcDeck[fcIdx];
+  if(!w) return;
   const d=fcCfg.dir;
+  /* 取り消しできるように、操作する前の状態を控えておく */
+  const dk=todayKey(), key=dirKey(w.no,d);
+  fcUndoStack.push({
+    type:type, no:w.no, dir:d, idx:fcIdx, date:dk,
+    wasMastered:isMastered(w.no,d), wasReview:isReview(w.no,d),
+    hadFlipDir:(store.study.dirs[dk]||[]).includes(key),
+    hadFlipDay:(store.study.days[dk]||[]).includes(w.no)
+  });
+  if(fcUndoStack.length>FC_UNDO_MAX) fcUndoStack.shift();
   if(type==='mastered'){
     fcRemoved[dirKey(w.no,d)]=fcIdx;
     recordFlip(w.no,d);   // 「覚えた」も学習したものとして数える（方向別）
@@ -1869,6 +1941,40 @@ function fcMark(type){
     saveSession();
     renderFcView();
   }
+}
+/* 直前の「覚えた」「また後で」を取り消す（続けて押すと、さらに前の操作へさかのぼる） */
+function fcUndo(){
+  const s=fcUndoStack.pop();
+  if(!s) return;
+  const d=s.dir, w=WBY[s.no];
+  if(!w) return;
+  // 覚えた／復習セットへの登録を、操作前の状態に戻す
+  store.mastered[d]=store.mastered[d].filter(n=>n!==s.no);
+  store.review[d]=store.review[d].filter(n=>n!==s.no);
+  if(s.wasMastered) store.mastered[d].push(s.no);
+  if(s.wasReview) store.review[d].push(s.no);
+  // その操作で新しく加わった学習記録（今日の学習数）も取り消す
+  if(s.type==='mastered'){
+    const dirs=store.study.dirs, days=store.study.days, key=dirKey(s.no,d);
+    if(!s.hadFlipDir && dirs[s.date]){
+      dirs[s.date]=dirs[s.date].filter(x=>x!==key);
+      if(!dirs[s.date].length) delete dirs[s.date];
+    }
+    if(!s.hadFlipDay && days[s.date] && !(dirs[s.date]||[]).some(x=>parseInt(x,10)===s.no)){
+      days[s.date]=days[s.date].filter(n=>n!==s.no);
+      if(!days[s.date].length) delete days[s.date];
+    }
+  }
+  delete fcRemoved[dirKey(s.no,d)];
+  // カードを元の位置に戻して、そのカードを表示する
+  let i=fcDeck.findIndex(x=>x.no===s.no);
+  if(i<0){ i=Math.min(s.idx,fcDeck.length); fcDeck.splice(i,0,w); }
+  fcIdx=i;
+  fcFlipped=false;
+  saveStore();
+  saveSession();
+  renderFcView();
+  showToast('↩ 取り消しました',1600);
 }
 function attachSwipe(el){
   let x0=null,y0=null;
@@ -1918,8 +2024,10 @@ function restoreWord(no,type){
     // 見ているカードは動かさず、戻したカードを元の位置に入れる
     const cur=fcDeck[fcIdx], w=WBY[no];
     const nd=buildFcDeck();
-    if(w && nd.some(x=>x.no===no) && !fcDeck.some(x=>x.no===no)){
-      if(fcCfg.order==='rand'){
+    const isNewSrc = fcCfg.src==='new';
+    const inScope = isNewSrc ? fcRemoved[dirKey(no,d)]!=null : nd.some(x=>x.no===no);
+    if(w && inScope && !fcDeck.some(x=>x.no===no)){
+      if(fcCfg.order==='rand' || isNewSrc){
         const pos=fcRemoved[dirKey(no,d)];
         fcDeck.splice(Math.min(pos==null?fcIdx:pos,fcDeck.length),0,w);
       } else {
