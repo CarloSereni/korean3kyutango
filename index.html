@@ -1394,6 +1394,7 @@ function render(){
   else if(screen==='goalNew') renderGoalNew();
   else if(screen==='calendar') renderCalendar();
   else if(screen==='dayCards') renderDayCards();
+  else if(screen==='tgSetup') renderTgSetup();
 }
 
 /* ============ ホーム ============ */
@@ -2382,6 +2383,12 @@ function showMatchResultBtn(){ showMatchResult(); }
 
 /* ============ 単語一覧 ============ */
 let listWeek=1;
+function wlRowHtml(w){
+  return `<tr>
+    <td class="wl-a"><span class="wl-no">${w.no}　${POS_LABEL[w.pos]}</span><b>${w.kr}</b>${w.read?`<br><span class="wl-sub">[${w.read}]</span>`:''}${w.hanja?`<br><span class="wl-sub">〔${w.hanja}〕</span>`:''}</td>
+    <td class="wl-b">${w.ja}${w.irr?`<br><span class="wl-sub">${w.irr}</span>`:''}${w.note?`<br><span class="wl-sub">${w.note}</span>`:''}</td>
+    <td class="wl-c">${w.ex||''}<br><span class="wl-sub">${w.exja||''}</span>${w.ex2?`<div class="wl-ex2">${w.ex2}<br><span class="wl-sub">${w.exja2||''}</span></div>`:''}</td></tr>`;
+}
 function renderWordList(){
   titleEl.textContent='単語一覧';
   const chips=Array.from({length:WEEKS_TOTAL},(_,i)=>i+1).map(w=>{
@@ -2389,10 +2396,7 @@ function renderWordList(){
     return `<div class="chip ${listWeek===w?'active':''} ${dis?'disabled':''}" ${dis?'':`onclick="listWeek=${w};renderWordList();window.scrollTo(0,0)"`}>UNIT${w}</div>`;
   }).join('');
   const ws=WORDS.filter(w=>w.week===listWeek);
-  const rows=ws.map(w=>`<tr>
-    <td class="wl-a"><span class="wl-no">${w.no}　${POS_LABEL[w.pos]}</span><b>${w.kr}</b>${w.read?`<br><span class="wl-sub">[${w.read}]</span>`:''}${w.hanja?`<br><span class="wl-sub">〔${w.hanja}〕</span>`:''}</td>
-    <td class="wl-b">${w.ja}${w.irr?`<br><span class="wl-sub">${w.irr}</span>`:''}${w.note?`<br><span class="wl-sub">${w.note}</span>`:''}</td>
-    <td class="wl-c">${w.ex||''}<br><span class="wl-sub">${w.exja||''}</span>${w.ex2?`<div class="wl-ex2">${w.ex2}<br><span class="wl-sub">${w.exja2||''}</span></div>`:''}</td></tr>`).join('');
+  const rows=ws.map(wlRowHtml).join('');
   main.innerHTML=`<div class="tabrow" style="margin-bottom:10px">${chips}</div>
     <div class="subnote" style="margin:0 0 8px">UNIT${listWeek} ・ ${ws.length}語</div>
     <table class="wl"><thead><tr><th>単語</th><th>意味</th><th>例文</th></tr></thead><tbody>${rows}</tbody></table>`;
@@ -2520,7 +2524,9 @@ function invStop(){
   if('speechSynthesis' in window) speechSynthesis.cancel();
   IV=null;
 }
+let invWasToday=false;
 function startInv(){
+  invWasToday=false;
   const pool=WORDS.filter(w=>w.week>=invCfg.weekFrom&&w.week<=invCfg.weekTo);
   if(pool.length<4){ alert('出題範囲の単語が足りません。'); return; }
   invStop(); sndInit();
@@ -2532,10 +2538,11 @@ function startInv(){
   invSpawn();
 }
 function renderInvView(){
-  titleEl.textContent='インベーダー（'+(invCfg.dir==='kr2ja'?'韓→日':'日→韓')+'）';
-  if(!IV){ nav('invSetup',false); return; }
+  const _d=(IV&&IV.today)?IV.dir:invCfg.dir;
+  titleEl.textContent=(IV&&IV.today?'今日の学習をゲームで振り返る（':'インベーダー（')+(_d==='kr2ja'?'韓→日':'日→韓')+'）';
+  if(!IV){ nav(invWasToday?'tgSetup':'invSetup',false); return; }
   main.innerHTML=`<div class="inv-phone">
-    <div class="inv-hud"><span>残り <b id="iT">60</b> 秒</span><span>撃破 <b id="iN">${IV.n}</b></span>
+    <div class="inv-hud"><span>残り <b id="iT">60</b> 秒</span><span>撃破 <b id="iN">${IV.n}</b>${IV.today?'／'+IV.total:''}</span>
       <span><span class="inv-mb" id="iMb" onclick="invMute('bgm')">BGM</span><span class="inv-mb" id="iMs" onclick="invMute('se')">SE</span></span></div>
     <div class="inv-field" id="iF"><div class="inv-toast" id="iToast"></div><div class="inv-en" id="iE"></div><div class="inv-line"></div><div class="inv-beam" id="iBeam"></div><div class="inv-cn"><div class="inv-bar" id="iBar"></div><div class="inv-base"></div></div></div>
     <div class="inv-panel"><div class="inv-q" id="iQ"></div><div class="inv-opts" id="iO"></div></div></div>`;
@@ -2545,10 +2552,11 @@ function renderInvView(){
 }
 function invSpawn(){
   if(!IV||IV.over) return;
-  if(!IV.queue.length) IV.queue=shuffleArr(IV.pool.slice());
+  if(!IV.queue.length) IV.queue=shuffleArr((IV.today?IV.pool.filter(x=>IV.remain.has(x.key)):IV.pool).slice());   // 今日モード：倒せていない語だけで作り直す
   const w=IV.queue.pop();
-  const sameP=IV.pool.filter(x=>x.pos===w.pos&&x.no!==w.no);
-  const dp=sameP.length>=3?sameP:IV.pool.filter(x=>x.no!==w.no);
+  const P=IV.today?IV.dpool(w):IV.pool;   // 誤答の候補（今日モードでは、その語と同じ級の単語）
+  const sameP=P.filter(x=>x.pos===w.pos&&x.no!==w.no);
+  const dp=sameP.length>=3?sameP:P.filter(x=>x.no!==w.no);
   const kr=IV.dir==='kr2ja';
   const opts=shuffleArr([w,...shuffleArr(dp.slice()).slice(0,3)]).map(o=>({no:o.no,text:kr?o.ja:o.kr,read:kr?'':o.read}));
   IV.cur={w,opts,picks:[]}; IV.lock=false;
@@ -2577,10 +2585,11 @@ function invPick(i){
   const btn=document.getElementById('iO').children[i];
   if(!ok){ seBuzz(); btn.classList.add('ng'); setTimeout(()=>btn.classList.remove('ng'),350); return; }
   IV.lock=true; IV.n++; document.getElementById('iN').textContent=IV.n;
+  if(IV.today){ IV.remain.delete(c.w.key); if(!IV.remain.size) IV.clearAt=Date.now(); }   // 最後の1語を撃った瞬間に時間を止める
   IV.log.push({w:c.w,picks:c.picks.slice(),res:c.picks.length===1?'first':'retry'});
   if(IV.dir==='ja2kr') speakKr(c.w.kr);
   const g=IV;
-  invFire(()=>{ if(IV===g&&!g.over) invSpawn(); });
+  invFire(()=>{ if(IV===g&&!g.over){ if(g.today&&!g.remain.size) invClear(); else invSpawn(); } });
 }
 function invFire(cb){
   const F=document.getElementById('iF'),E=document.getElementById('iE'),f=F.getBoundingClientRect(),r=E.getBoundingClientRect();
@@ -2597,7 +2606,7 @@ function invFire(cb){
   },180);
 }
 function invTick(){
-  if(!IV||IV.over) return;
+  if(!IV||IV.over||IV.clearAt) return;
   const left=Math.max(0,Math.ceil((IV.end-Date.now())/1000));
   const t=document.getElementById('iT'); if(t) t.textContent=left;
   if(left<=0) invOver();
@@ -2611,6 +2620,7 @@ function invOver(){
 }
 function showInvResult(){
   const g=IV; if(!g||g.done) return; g.done=true;
+  if(g.today){ showTgResult(g); return; }
   const n=g.n;
   store.invRank=store.invRank||{};
   let list=store.invRank[g.key]||[];
@@ -2644,6 +2654,99 @@ function showInvResult(){
     <div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="nav('invSetup')">設定に戻る</span></div>`;
   window.scrollTo(0,0);
   setTimeout(()=>{ if(isBest) fxFire(); else if(inTop) fxConfetti(); },250);
+}
+
+/* ============ 今日の学習をゲームで振り返る（インベーダー・今日学習した語だけ。3級・4級は区別しない） ============ */
+let tg={dir:'kr2ja'};
+function tgWords(){
+  const k=todayKey(), out=[], seen=new Set();
+  const add=(lv,arr,nos)=>{
+    const m=new Map(arr.map(w=>[w.no,w]));
+    (nos||[]).forEach(n=>{ const w=m.get(n); if(!w) return; const key=lv+':'+n; if(seen.has(key)) return; seen.add(key); out.push(Object.assign({},w,{lv:lv,key:key})); });
+  };
+  add(LEVEL, WORDS, store.study.days[k]);
+  const OL=LEVEL==='4'?'3':'4', OW=OL==='4'?(typeof WORDS4!=='undefined'?WORDS4:null):WORDS3;
+  if(OW){   // もう一方の級の今日の学習（読み取りのみ）
+    let od=otherStudy.days;
+    try{ od=normStore(JSON.parse(localStorage.getItem(OTHER_KEY)||'null')).study.days; }catch(e){}
+    add(OL, OW, od[k]);
+  }
+  return out;
+}
+function openTodayGame(){
+  if(!tgWords().length){ showToast('今日はまだカードをめくっていません',2800); return; }
+  tg={dir:invCfg.dir}; nav('tgSetup');
+}
+function renderTgSetup(){
+  titleEl.textContent='今日の学習をゲームで振り返る';
+  const ws=tgWords(), n3=ws.filter(w=>w.lv==='3').length, n4=ws.filter(w=>w.lv==='4').length;
+  const lvTxt=(n3&&n4)?`（4級${n4}語・3級${n3}語）`:'';
+  main.innerHTML=`<div class="setup-block"><h3>方向</h3><div class="tabs">
+      <div class="chip ${tg.dir==='kr2ja'?'active':''}" onclick="tg.dir='kr2ja';render()">韓国語 → 日本語</div>
+      <div class="chip ${tg.dir==='ja2kr'?'active':''}" onclick="tg.dir='ja2kr';render()">日本語 → 韓国語</div></div></div>
+    <div class="setup-block"><h3>サウンド</h3><div class="tabs">
+      <div class="chip ${invSet.bgm?'active':''}" onclick="invToggle('bgm');render()">BGM ${invSet.bgm?'ON':'OFF'}</div>
+      <div class="chip ${invSet.se?'active':''}" onclick="invToggle('se');render()">効果音 ${invSet.se?'ON':'OFF'}</div></div></div>
+    <div class="subnote" style="margin-bottom:14px">今日学習した <b>${ws.length}語</b>${lvTxt}だけが出題されます（順番はランダム）。<br>制限時間60秒。ルールは通常のインベーダーと同じで、侵略された語は後でもう一度出題されます。<br>60秒以内に今日の語を全部撃破すると、ゲームクリアです。</div>
+    <button class="startbtn" onclick="startTodayInv()">スタート</button>`;
+}
+function startTodayInv(){
+  const ws=tgWords();
+  if(!ws.length){ showToast('今日はまだカードをめくっていません',2800); return; }
+  invWasToday=true;
+  const rng={};   // 級ごとに、今日の語が入っているUNITの範囲（誤答はこの範囲の語から作る）
+  ws.forEach(w=>{ const r=rng[w.lv]||(rng[w.lv]=[99999,0]); r[0]=Math.min(r[0],w.week); r[1]=Math.max(r[1],w.week); });
+  const dps={};
+  const dpool=w=>{
+    if(!dps[w.lv]){
+      const all=w.lv==='4'?WORDS4:WORDS3;
+      let p=all.filter(x=>x.week>=rng[w.lv][0]&&x.week<=rng[w.lv][1]); if(p.length<4) p=all;
+      dps[w.lv]=p;
+    }
+    return dps[w.lv];
+  };
+  invStop(); sndInit();
+  try{ const u=new SpeechSynthesisUtterance('　'); u.volume=0; speechSynthesis.speak(u); }catch(e){}
+  IV={pool:ws,dpool:dpool,queue:[],log:[],n:0,end:Date.now()+60000,over:false,done:false,cur:null,lock:false,dir:tg.dir,key:'today',timer:null,
+      today:true,total:ws.length,remain:new Set(ws.map(w=>w.key)),clearAt:0,cleared:false};
+  nav('invView', screen!=='invView');
+  IV.timer=setInterval(invTick,200);
+  bgmStart();
+  invSpawn();
+}
+function invClear(){
+  IV.over=true; IV.cleared=true; clearInterval(IV.timer); bgmStop(); seEnd();
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  document.getElementById('iE').style.animationPlayState='paused';
+  document.getElementById('iToast').textContent='ALL CLEAR！';
+  document.getElementById('iO').innerHTML=`<button class="startbtn" style="grid-column:1/-1" onclick="showInvResult()">結果を見る（次へ）</button>`;
+}
+function showTgResult(g){
+  const kr=g.dir==='kr2ja', cleared=g.cleared, left=g.remain.size;
+  const secs=cleared?(g.clearAt-(g.end-60000))/1000:0;
+  const rows=g.log.map((l,i)=>{
+    const w=l.w;
+    const q=kr?`${w.kr}${spkBtn(w.kr)}`:w.ja;
+    const a=kr?w.ja:`${w.kr}${spkBtn(w.kr)}`;
+    const sel=l.picks.length?l.picks.join(' → '):'（選択なし）';
+    const mk=l.res==='first'?'<span class="iv-ok">○</span>':l.res==='retry'?'<span class="iv-re">△</span>':'<span class="iv-ng">×</span>';
+    return `<tr><td>${i+1}</td><td>${q}</td><td>${a}</td><td>${sel}</td><td>${mk}</td></tr>`;
+  }).join('');
+  const leftWords=g.pool.filter(w=>g.remain.has(w.key)).map(w=>`<tr><td>${w.kr}${spkBtn(w.kr)}</td><td>${w.ja}</td></tr>`).join('');
+  main.innerHTML=`<div style="text-align:center;padding:10px 0 14px">
+      <div style="font-size:40px">${cleared?'🎉':'👾'}</div>
+      <div style="font-size:22px;font-weight:700;margin:4px 0">${cleared?'ゲームクリア！':'タイムアップ'}</div>
+      <div>今日学習した ${g.total}語 のうち</div>
+      <div style="font-size:36px;font-weight:700;margin:4px 0">${g.n} / ${g.total} 語 撃破</div>
+      ${cleared?`<div style="color:var(--ok);font-weight:700">クリアタイム ${(Math.round(secs*10)/10).toFixed(1)}秒</div>`:`<div class="subnote">あと ${left}語 でクリアでした</div>`}</div>
+    <div class="setup-block"><h3>出題と回答の振り返り</h3>
+      <div style="overflow-x:auto"><table class="iv-tbl"><thead><tr><th>#</th><th>問題</th><th>答え</th><th>選んだ選択肢</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="5">撃破・侵略された問題はありませんでした。</td></tr>'}</tbody></table></div>
+      <div class="subnote">○ 一発で撃破　△ 間違えた後に撃破　× 侵略された</div></div>
+    ${left?`<div class="setup-block"><h3>倒せなかった語（${left}語）</h3><div style="overflow-x:auto"><table class="iv-tbl"><thead><tr><th>単語</th><th>意味</th></tr></thead><tbody>${leftWords}</tbody></table></div></div>`:''}
+    <button class="startbtn" onclick="startTodayInv()">もう一度挑戦</button>
+    <div class="footer-note"><span style="text-decoration:underline;cursor:pointer" onclick="nav('tgSetup')">設定に戻る</span>　／　<span style="text-decoration:underline;cursor:pointer" onclick="goHome()">トップに戻る</span></div>`;
+  window.scrollTo(0,0);
+  if(cleared) setTimeout(()=>{ fxFire(); },250);
 }
 
 /* ============ 日付ユーティリティ ============ */
@@ -2964,7 +3067,8 @@ function homeGoalHtml(){
       <div class="gdir">${['kr2ja','ja2kr'].map(d=>`<div class="chip ${store.goalDir===d?'active':''}" onclick="setGoalDir('${d}')">${d==='kr2ja'?'韓国語→日本語':'日本語→韓国語'}</div>`).join('')}</div>`;
   }
   const links=`<div class="glinks"><span onclick="nav('goalHome')">🎯 目標の設定・記録</span><span onclick="openCalendar()">📅 カレンダー</span></div>
-    <div class="glinks" style="margin-top:10px"><span style="font-size:16px;font-weight:700" onclick="openDayCards()">🌙 今日の学習を振り返る（${todayCardsCount()}枚）</span></div>`;
+    <div class="glinks" style="margin-top:10px"><span style="font-size:16px;font-weight:700" onclick="openDayCards()">🌙 今日の学習を振り返る（${todayCardsCount()}枚）</span></div>
+    <div class="glinks" style="margin-top:10px"><span style="font-size:16px;font-weight:700" onclick="openTodayGame()">🎮 今日の学習をゲームで振り返る</span></div>`;
   return `${tiles}${pend}<div class="gcard">${tabs}${body}${links}</div>`;
 }
 
@@ -3142,7 +3246,21 @@ let dayCfg={dir:'kr2ja',order:'seq',n:10};
 let dayCardsDate=todayKey();
 function dayCardsLabel(date){ return date===todayKey()?'今日のカード':fmtShort(date)+'のカード'; }
 function todayCardsCount(){ return (store.study.days[todayKey()]||[]).filter(n=>WBY[n]).length; }
-function openDayCards(date){ dayCardsDate=date||todayKey(); nav('dayCards'); }
+function openDayCards(date){ dayCardsDate=date||todayKey(); dayListOpen=false; nav('dayCards'); }
+/* 学習した単語のリスト（単語一覧と同じ表示）。タップで開閉する */
+let dayListOpen=false;
+function dayListToggle(){ dayListOpen=!dayListOpen; renderDayCards(); }
+function dayListHtml(nos){
+  const ws=Array.from(new Set(nos)).map(n=>WBY[n]).filter(Boolean).sort((a,b)=>(a.week-b.week)||(a.no-b.no));
+  if(!ws.length) return '';
+  let rows='', lastU=0;
+  if(dayListOpen) ws.forEach(w=>{
+    if(w.week!==lastU){ lastU=w.week; rows+=`<tr><td colspan="3" style="background:var(--paper);font-size:12px;font-weight:700;padding:4px 6px;">UNIT${w.week}</td></tr>`; }
+    rows+=wlRowHtml(w);
+  });
+  return `<div class="setup-block"><button class="startbtn" style="margin-top:0;background:var(--ink)" onclick="dayListToggle()">📖 学習した単語を${dayListOpen?'閉じる':'見る'}（${ws.length}語）</button>
+    ${dayListOpen?`<div style="overflow-x:auto;margin-top:10px"><table class="wl"><thead><tr><th>単語</th><th>意味</th><th>例文</th></tr></thead><tbody>${rows}</tbody></table></div>`:''}</div>`;
+}
 function dayCardNos(){ return (store.study.days[dayCardsDate]||[]).filter(n=>WBY[n]); }
 function renderDayCards(){
   titleEl.textContent=dayCardsLabel(dayCardsDate);
@@ -3161,6 +3279,7 @@ function renderDayCards(){
     <div class="setup-block"><div class="prev-box" style="text-align:center"><div style="font-size:12px">${fmtDate(dayCardsDate)}</div>
       <div style="font-size:26px;font-weight:700;color:var(--ink)">${cnt}<small style="font-size:13px;font-weight:400">枚</small></div>
       <div style="font-size:11.5px;color:var(--sub)">${brk}</div></div></div>
+    ${dayListHtml(nos)}
     <div class="setup-block"><h3>方向</h3><div class="tabs">${dirC}</div></div>
     <div class="setup-block"><h3>🗂 復習（フラッシュカード）</h3>
       <div class="tabs">${ordC}</div>
